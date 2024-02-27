@@ -22,7 +22,7 @@ classifiers = [
 dependencies = [
     'jax>=0.4',                     # Numerical computing library
     'typing_extensions>=4.6',       # Typing extensions for Python
-    'pynapple @ git+https://github.com/pynapple-org/pynapple.git',
+    'pynapple @ git+https://github.com/pynapple-org/pynapple.git@pynajax',
     'jaxlib'
 ]
 

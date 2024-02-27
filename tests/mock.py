@@ -1,6 +1,6 @@
+import jax.numpy as jnp
 import numpy as np
 import pynapple as nap
-import jax.numpy as jnp
 
 
 def create_nap(t, d, time_support):

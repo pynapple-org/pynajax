@@ -1,4 +1,5 @@
 from functools import partial
+
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -6,6 +7,29 @@ import pynapple as nap
 
 _convolve_vec = jax.vmap(partial(jnp.convolve, mode="same"), (1, None), 1)
 _convolve_mat = jax.vmap(_convolve_vec, (None, 1), -1)
+
+
+def construct_nap(time, data, time_support, columns):
+    """
+
+    Parameters
+    ----------
+    time
+    data
+    time_support
+    columns
+
+    Returns
+    -------
+
+    """
+    if data.ndim == 1:
+        data = nap.Tsd(t=time, d=data, time_support=time_support)
+    elif data.ndim == 2:
+        data = nap.TsdFrame(t=time, d=data, columns=columns, time_support=time_support)
+    else:
+        data = nap.TsdTensor(t=time, d=data, time_support=time_support)
+    return data
 
 
 def convolve_epoch(data, kernel):
@@ -49,14 +73,7 @@ def convolve_epoch(data, kernel):
         data = _convolve_mat(data, kernel).reshape((*orig_shape, kernel.shape[1]))
 
     # Recreate pynapple object
-    data = np.asarray(data)
-    if data.ndim == 1:
-        data = nap.Tsd(t=time, d=data, time_support=time_support)
-    elif data.ndim == 2:
-        data = nap.TsdFrame(t=time, d=data, columns=columns, time_support=time_support)
-    else:
-        data = nap.TsdTensor(t=time, d=data, time_support=time_support)
-
+    data = construct_nap(time, data, time_support, columns)
     return data
 
 
@@ -87,5 +104,12 @@ def convolve_intervals(data, kernel):
     func = partial(convolve_epoch, kernel=kernel)
     convolved_epochs = jax.tree_map(lambda x: func(x).d, tree)
 
-    # Reconstruct the timeseries object
+    # Concatenate the convolved epochs
     convolved_data = jnp.concatenate(convolved_epochs, axis=0)
+
+    # Reconstruct the timeseries object
+    columns = None
+    if kernel.ndim == 1 and hasattr(data, "columns"):
+        columns = data.columns
+
+    return construct_nap(data.t, convolved_data, data.time_support, columns)
