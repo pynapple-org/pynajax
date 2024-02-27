@@ -113,3 +113,9 @@ def convolve_intervals(data, kernel):
         columns = data.columns
 
     return construct_nap(data.t, convolved_data, data.time_support, columns)
+
+
+def convolve(data, kernel):
+    if len(data.time_support) > 1:
+        return convolve_epoch(data, kernel)
+    return convolve_intervals(data, kernel)
