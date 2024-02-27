@@ -9,12 +9,9 @@ import pynajax as jnap
 import pynajax.jax_core
 from contextlib import nullcontext as does_not_raise
 
+
 @pytest.mark.parametrize(
-    "shape_array1, shape_array2",
-    [
-        ((3, ), (10, 2)),
-        ((3, ), (10, 2, 3))
-    ]
+    "shape_array1, shape_array2", [((3,), (10, 2)), ((3,), (10, 2, 3))]
 )
 def test_2d_convolve_epoch_vec(shape_array1, shape_array2):
     """Compare convolution with numpy for 1D kernel"""
@@ -39,11 +36,7 @@ def test_2d_convolve_epoch_vec(shape_array1, shape_array2):
 
 
 @pytest.mark.parametrize(
-    "shape_array1, shape_array2",
-    [
-        ((3, 2), (10, 2)),
-        ((3, 2), (10, 2, 3))
-    ]
+    "shape_array1, shape_array2", [((3, 2), (10, 2)), ((3, 2), (10, 2, 3))]
 )
 def test_2d_convolve_epoch_mat(shape_array1, shape_array2):
     """Compare convolution with numpy for 2D kernel"""
@@ -55,7 +48,9 @@ def test_2d_convolve_epoch_mat(shape_array1, shape_array2):
     for j in range(arr1.shape[1]):
         for indices in itertools.product(*[range(dim) for dim in arr2.shape[1:]]):
             full_indices = (slice(None),) + indices
-            res_numpy[(*full_indices, j)] = np.convolve(arr1[:, j], arr2[full_indices], mode="same")
+            res_numpy[(*full_indices, j)] = np.convolve(
+                arr1[:, j], arr2[full_indices], mode="same"
+            )
 
     if arr2.ndim == 1:
         arr2 = nap.Tsd(t=np.arange(arr2.shape[0]), d=jnp.asarray(arr2))
@@ -72,68 +67,59 @@ def test_2d_convolve_epoch_mat(shape_array1, shape_array2):
 @pytest.mark.parametrize(
     "iset",
     [
-       nap.IntervalSet(start=[0], end=[100]),
-       nap.IntervalSet(start=[0, 20], end=[19, 100])
-    ]
+        nap.IntervalSet(start=[0], end=[100]),
+        nap.IntervalSet(start=[0, 20], end=[19, 100]),
+    ],
 )
 @pytest.mark.parametrize(
     "data",
-    [
-       jnp.ones((100,)),
-       jnp.ones((100, 1)),
-       jnp.ones((100, 2)),
-       jnp.ones((100, 2, 3))
-    ]
+    [jnp.ones((100,)), jnp.ones((100, 1)), jnp.ones((100, 2)), jnp.ones((100, 2, 3))],
 )
 @pytest.mark.parametrize(
     "time",
     [
-       np.arange(100),
-    ]
+        np.arange(100),
+    ],
 )
 @pytest.mark.parametrize(
     "kernel",
     [
-       np.ones((10,)),
-       np.ones((10, 1)),
-       np.ones((10, 2)),
-       jnp.ones((10,)),
-       jnp.ones((10, 1)),
-       jnp.ones((10, 2)),
-    ]
+        np.ones((10,)),
+        np.ones((10, 1)),
+        np.ones((10, 2)),
+        jnp.ones((10,)),
+        jnp.ones((10, 1)),
+        jnp.ones((10, 2)),
+    ],
 )
 def test_convolve_intervals(time, data, iset, kernel):
     """Run convolution on single and multi interval."""
     nap_data = pynajax.jax_core.construct_nap(time, data, iset, None)
     pynajax.jax_core.convolve_intervals(nap_data, kernel)
 
+
 @pytest.mark.parametrize(
     "iset",
     [
-       nap.IntervalSet(start=[0], end=[100]),
-       nap.IntervalSet(start=[0, 20], end=[19, 100])
-    ]
+        nap.IntervalSet(start=[0], end=[100]),
+        nap.IntervalSet(start=[0, 20], end=[19, 100]),
+    ],
 )
 @pytest.mark.parametrize(
     "data",
-    [
-       jnp.ones((100,)),
-       jnp.ones((100, 1)),
-       jnp.ones((100, 2)),
-       jnp.ones((100, 2, 3))
-    ]
+    [jnp.ones((100,)), jnp.ones((100, 1)), jnp.ones((100, 2)), jnp.ones((100, 2, 3))],
 )
 @pytest.mark.parametrize(
     "time",
     [
-       np.arange(100),
-    ]
+        np.arange(100),
+    ],
 )
 @pytest.mark.parametrize(
     "kernel",
     [
-       np.ones((10,)),
-    ]
+        np.ones((10,)),
+    ],
 )
 def test_convolve_intervals_shape_1d_kernel(time, data, iset, kernel):
     """Check that the shape of input and output matches if kernel is 1D."""
@@ -146,31 +132,26 @@ def test_convolve_intervals_shape_1d_kernel(time, data, iset, kernel):
 @pytest.mark.parametrize(
     "iset",
     [
-       nap.IntervalSet(start=[0], end=[100]),
-       nap.IntervalSet(start=[0, 20], end=[19, 100])
-    ]
+        nap.IntervalSet(start=[0], end=[100]),
+        nap.IntervalSet(start=[0, 20], end=[19, 100]),
+    ],
 )
 @pytest.mark.parametrize(
     "data",
-    [
-       jnp.ones((100,)),
-       jnp.ones((100, 1)),
-       jnp.ones((100, 2)),
-       jnp.ones((100, 2, 3))
-    ]
+    [jnp.ones((100,)), jnp.ones((100, 1)), jnp.ones((100, 2)), jnp.ones((100, 2, 3))],
 )
 @pytest.mark.parametrize(
     "time",
     [
-       np.arange(100),
-    ]
+        np.arange(100),
+    ],
 )
 @pytest.mark.parametrize(
     "kernel",
     [
-       np.ones((10, 1)),
-       np.ones((10, 2)),
-    ]
+        np.ones((10, 1)),
+        np.ones((10, 2)),
+    ],
 )
 def test_convolve_intervals_shape_2d_kernel(time, data, iset, kernel):
     """
@@ -186,9 +167,9 @@ def test_convolve_intervals_shape_2d_kernel(time, data, iset, kernel):
 @pytest.mark.parametrize(
     "iset",
     [
-       nap.IntervalSet(start=[0], end=[100]),
-       nap.IntervalSet(start=[0, 20], end=[19, 100])
-    ]
+        nap.IntervalSet(start=[0], end=[100]),
+        nap.IntervalSet(start=[0, 20], end=[19, 100]),
+    ],
 )
 @pytest.mark.parametrize(
     "data, columns",
@@ -196,20 +177,20 @@ def test_convolve_intervals_shape_2d_kernel(time, data, iset, kernel):
         (jnp.ones((100, 1)), ["a"]),
         (jnp.ones((100, 2)), ["a", "b"]),
         (jnp.ones((100, 2)), None),
-    ]
+    ],
 )
 @pytest.mark.parametrize(
     "time",
     [
-       np.arange(100),
-    ]
+        np.arange(100),
+    ],
 )
 @pytest.mark.parametrize(
     "kernel, expectation",
     [
-        (np.ones((10, )), does_not_raise()),
-        (np.ones((10, 1)), pytest.raises(AttributeError))
-    ]
+        (np.ones((10,)), does_not_raise()),
+        (np.ones((10, 1)), pytest.raises(AttributeError)),
+    ],
 )
 def test_convolve_intervals_columns(time, data, iset, kernel, columns, expectation):
     """
@@ -219,38 +200,35 @@ def test_convolve_intervals_columns(time, data, iset, kernel, columns, expectati
     print("here", type(nap_data.columns))
     res = pynajax.jax_core.convolve_intervals(nap_data, kernel)
     with expectation:
-        assert all(nap_data.columns[i] == res.columns[i] for i in range(len(nap_data.columns)))
+        assert all(
+            nap_data.columns[i] == res.columns[i] for i in range(len(nap_data.columns))
+        )
 
 
 @pytest.mark.parametrize(
     "iset",
     [
-       nap.IntervalSet(start=[0], end=[100]),
-       nap.IntervalSet(start=[0, 20], end=[19, 100])
-    ]
+        nap.IntervalSet(start=[0], end=[100]),
+        nap.IntervalSet(start=[0, 20], end=[19, 100]),
+    ],
 )
 @pytest.mark.parametrize(
     "data",
-    [
-       jnp.ones((100,)),
-       jnp.ones((100, 1)),
-       jnp.ones((100, 2)),
-       jnp.ones((100, 2, 3))
-    ]
+    [jnp.ones((100,)), jnp.ones((100, 1)), jnp.ones((100, 2)), jnp.ones((100, 2, 3))],
 )
 @pytest.mark.parametrize(
     "time",
     [
-       np.arange(100),
-    ]
+        np.arange(100),
+    ],
 )
 @pytest.mark.parametrize(
     "kernel",
     [
-       np.ones((10, )),
-       np.ones((10, 1)),
-       np.ones((10, 2)),
-    ]
+        np.ones((10,)),
+        np.ones((10, 1)),
+        np.ones((10, 2)),
+    ],
 )
 def test_convolve_construct_nap_type(time, data, iset, kernel):
     """
@@ -264,24 +242,19 @@ def test_convolve_construct_nap_type(time, data, iset, kernel):
 @pytest.mark.parametrize(
     "iset",
     [
-       nap.IntervalSet(start=[0], end=[100]),
-       nap.IntervalSet(start=[0, 20], end=[19, 100])
-    ]
+        nap.IntervalSet(start=[0], end=[100]),
+        nap.IntervalSet(start=[0, 20], end=[19, 100]),
+    ],
 )
 @pytest.mark.parametrize(
     "data",
-    [
-       jnp.ones((100,)),
-       jnp.ones((100, 1)),
-       jnp.ones((100, 2)),
-       jnp.ones((100, 2, 3))
-    ]
+    [jnp.ones((100,)), jnp.ones((100, 1)), jnp.ones((100, 2)), jnp.ones((100, 2, 3))],
 )
 @pytest.mark.parametrize(
     "time",
     [
-       np.arange(100),
-    ]
+        np.arange(100),
+    ],
 )
 def test_construct_nap_type(time, data, iset):
     """
@@ -292,13 +265,12 @@ def test_construct_nap_type(time, data, iset):
     assert isinstance(nap_data.d, jnp.ndarray)
 
 
-
 @pytest.mark.parametrize(
     "iset",
     [
-       nap.IntervalSet(start=[0], end=[100]),
-       nap.IntervalSet(start=[0, 20], end=[19, 100])
-    ]
+        nap.IntervalSet(start=[0], end=[100]),
+        nap.IntervalSet(start=[0, 20], end=[19, 100]),
+    ],
 )
 @pytest.mark.parametrize(
     "data, columns",
@@ -306,13 +278,13 @@ def test_construct_nap_type(time, data, iset):
         (jnp.ones((100, 1)), ["a"]),
         (jnp.ones((100, 2)), ["a", "b"]),
         (jnp.ones((100, 2)), None),
-    ]
+    ],
 )
 @pytest.mark.parametrize(
     "time",
     [
-       np.arange(100),
-    ]
+        np.arange(100),
+    ],
 )
 def test_construct_nap_columns(time, data, iset, columns):
     """
