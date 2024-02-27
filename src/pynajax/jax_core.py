@@ -4,14 +4,12 @@ import jax.numpy as jnp
 import numpy as np
 import pynapple as nap
 
-
 _convolve_vec = jax.vmap(partial(jnp.convolve, mode="same"), (1, None), 1)
 _convolve_mat = jax.vmap(_convolve_vec, (None, 1), -1)
 
 
-def convolve(data, kernel):
-    """Convolves every dimension of data, except for the first which 
-    is assumed to be time, with every column of kernel.
+def convolve_epoch(data, kernel):
+    """Convolves a single continuous temporal epoch
 
     Parameters
     ----------
@@ -45,7 +43,7 @@ def convolve(data, kernel):
         raise IOError(
             "Provide a kernel with at least 1 dimension, current kernel has 0 dimensions"
         )
-    elif kernel.ndim == 1:
+    if kernel.ndim == 1:
         data = _convolve_vec(data, kernel).reshape(orig_shape)
     else:
         data = _convolve_mat(data, kernel).reshape((*orig_shape, kernel.shape[1]))
@@ -60,3 +58,34 @@ def convolve(data, kernel):
         data = nap.TsdTensor(t=time, d=data, time_support=time_support)
 
     return data
+
+
+def convolve_intervals(data, kernel):
+    """Convolves every dimension of data, except for the first which
+    is assumed to be time, with every column of kernel.
+
+    Parameters
+    ----------
+    data : pynapple.Tsd, pynapple.TsdFrame, pynapple.TsdTensor
+        Pynapple timeseries object with data to be convolved
+    kernel : numpy.ndarray, jax.numpy.ndarray
+        1-D or 2-D array with kernel(s) to be used for convolution.
+        First dimension is assumed to be time.
+
+    Returns
+    -------
+    pynapple.Tsd, pynapple.TsdFrame, pynapple.TsdTensor
+        Pynapple timeseries object with convolved data. If kernel is a 1-D array,
+        the dimensions of the input data are retained. If kernel is a 2-D array,
+        another (last) dimension is added to store convolution with every column of kernels.
+    """
+
+    # Create a tree of pynapple timeseries objects for each epoch
+    tree = [data.get(start, end) for start, end in data.time_support.values]
+
+    # Convolve each epoch
+    func = partial(convolve_epoch, kernel=kernel)
+    convolved_epochs = jax.tree_map(lambda x: func(x).d, tree)
+
+    # Reconstruct the timeseries object
+    convolved_data = jnp.concatenate(convolved_epochs, axis=0)
