@@ -28,7 +28,7 @@ class MockArray:
             A list of data elements that the MockArray will contain.
         """
         self._nap = create_nap(t=np.asarray(t), d=np.asarray(d), time_support=time_support)
-        self.d = np.asarray(d)
+        self.d = jnp.asarray(d)
         self.t = np.asarray(t)
         self.time_support = self._nap.time_support
         self.shape = self.d.shape # Simplified shape attribute
