@@ -6,7 +6,7 @@ import itertools
 
 import pynajax.jax_core
 import pynapple as nap
-from mock import MockArray
+from tests.mock import MockArray
 
 @pytest.mark.parametrize(
     "shape_array1, shape_array2",
