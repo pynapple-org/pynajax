@@ -9,21 +9,18 @@ authors = [{name = "pynajax authors"}]
 description = "A JAX backend for pynapple."
 readme = "README.md"
 requires-python = ">=3.8"
-keywords = ["neuroscience", "Poisson-GLM"]
+keywords = ["neuroscience", "jax-backend", "pynapple"]
 license = { file = "LICENSE" }
 classifiers = [
     "Intended Audience :: Science/Research",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10"
 ]
 
 # Define dependencies for the project
 dependencies = [
     'jax>=0.4',                     # Numerical computing library
-    'matplotlib>=3.7',              # Plotting library
     'typing_extensions>=4.6',       # Typing extensions for Python
     'pynapple'
 ]
@@ -46,4 +43,5 @@ dev = [
     "flake8",                       # Code linter
     "coverage",                     # Test coverage measurement
     "pytest-cov",                   # Test coverage plugin for pytest
+    'matplotlib>=3.7',              # Plotting library
 ]
