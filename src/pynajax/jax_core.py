@@ -15,6 +15,7 @@ def convolve(data, kernel):
     orig_shape = data.shape
     time = data.t
     time_support = data.time_support
+    columns = None
     if data.ndim == 2:
         columns = data.columns
 
