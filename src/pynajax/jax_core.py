@@ -1,6 +1,7 @@
 from functools import partial
 import jax
 import jax.numpy as jnp
+import numpy as np
 import pynapple as nap
 
 
@@ -30,6 +31,7 @@ def convolve(data, kernel):
 
 
     # Recreate pynapple object
+    data = np.asarray(data)
     if data.ndim == 1:
         data = nap.Tsd(t=time, d=data, time_support=time_support)
     elif data.ndim == 2:
