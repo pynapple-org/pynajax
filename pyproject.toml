@@ -22,7 +22,8 @@ classifiers = [
 dependencies = [
     'jax>=0.4',                     # Numerical computing library
     'typing_extensions>=4.6',       # Typing extensions for Python
-    'pynapple'
+    'pynapple',
+    'jaxlib'
 ]
 
 
