@@ -1,24 +1,41 @@
+from functools import partial
 import jax
-import pynajax as jnap
-import pytest
-import numpy as np
-import itertools
+import jax.numpy as jnp
+import pynapple as nap
 
 
-@pytest.mark.parametrize(
-    "shape_array1, shape_array2",
-    [
-        ((3, ), (10, 2)),
-        ((3, ), (10, 2, 3))
-    ]
-)
-def test_2d_conv(shape_array1, shape_array2):
-    np.random.seed(111)
-    arr1 = np.random.normal(size=shape_array1)
-    arr2 = np.random.normal(size=shape_array2)
+_convolve_vec = jax.vmap(partial(jnp.convolve, mode="same"), (1, None), 1)
+_convolve_mat = jax.vmap(_convolve_vec, (None, 1), -1)
 
-    res_numpy = np.zeros((arr2.shape[0] - arr1.shape[0]+1, *arr2.shape[1:]))
-    for indices in itertools.product(*[range(dim) for dim in arr2.shape[1:]]):
-        full_indices = (slice(None),) + indices
-        res_numpy[full_indices] = np.convolve(arr1, arr2[full_indices], mode="valid")
+
+def convolve(data, kernel):
+
+    # Store extra information of the pynapple object to add back later
+    orig_shape = data.shape
+    time = data.t
+    time_support = data.time_support
+    if data.ndim == 2:
+        columns = data.columns
+
+    # Flatten all dimensions except for the first (time) dimension
+    data = jnp.reshape(data.d, (data.shape[0], -1))
+
+    # Perform convolution
+    if kernel.ndim == 0:
+        raise IOError("Provide a kernel with at least 1 dimension, current kernel has 0 dimensions")
+    elif kernel.ndim == 1:
+        data = _convolve_vec(data, kernel).reshape(orig_shape)
+    else:
+        data = _convolve_mat(data, kernel).reshape((*orig_shape, kernel.shape[1]))
+
+
+    # Recreate pynapple object
+    if data.ndim == 1:
+        data = nap.Tsd(t=time, d=data, time_support=time_support)
+    elif data.ndim == 2:
+        data = nap.TsdFrame(t=time, d=data, columns=columns, time_support=time_support)
+    else:
+        data = nap.TsdTensor(t=time, d=data, time_support=time_support)
+
+    return data
 
