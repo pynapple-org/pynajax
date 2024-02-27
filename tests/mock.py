@@ -1,4 +1,15 @@
 import numpy as np
+import pynapple as nap
+import jax.numpy as jnp
+
+
+def create_nap(t, d, time_support):
+    if d.ndim == 1:
+        return nap.Tsd(t, d, time_support=time_support)
+    elif d.ndim == 2:
+        return nap.TsdFrame(t, d, time_support=time_support)
+    else:
+        return nap.TsdTensor(t, d, time_support=time_support)
 
 
 class MockArray:
@@ -8,7 +19,7 @@ class MockArray:
     instance of numpy.ndarray.
     """
 
-    def __init__(self, data):
+    def __init__(self, t, d, time_support=None):
         """
         Initializes the MockArray with data.
         Parameters
@@ -16,10 +27,13 @@ class MockArray:
         data : Union[numpy.ndarray, List]
             A list of data elements that the MockArray will contain.
         """
-        self.data = np.asarray(data)
-        self.shape = self.data.shape # Simplified shape attribute
+        self._nap = create_nap(t=np.asarray(t), d=np.asarray(d), time_support=time_support)
+        self.d = np.asarray(d)
+        self.t = np.asarray(t)
+        self.time_support = self._nap.time_support
+        self.shape = self.d.shape # Simplified shape attribute
         self.dtype = 'float64'  # Simplified dtype; in real scenarios, this should be more dynamic
-        self.ndim = self.data.ndim  # Simplified ndim for a 1-dimensional array
+        self.ndim = self.d.ndim  # Simplified ndim for a 1-dimensional array
 
     def __getitem__(self, index):
         """
@@ -32,16 +46,20 @@ class MockArray:
         -------
         The element(s) at the specified index.
         """
-        return self.data[index]
+        return self.d[index]
 
     def __iter__(self):
         """
         Supports iteration over the mock array.
         """
-        return iter(self.data)
+        return iter(self.d)
 
     def __len__(self):
         """
         Returns the length of the mock array.
         """
-        return len(self.data)
+        return len(self.d)
+
+    def get(self, start, end=None):
+        nap_new = self._nap.get(start, end)
+        return MockArray(t=nap_new.t, d=jnp.asarray(nap_new.d), time_support=nap_new.time_support)
