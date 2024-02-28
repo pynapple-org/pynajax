@@ -1,6 +1,7 @@
 # pynajax 
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/pynapple-org/pynajax/blob/main/LICENSE)
+![Python version](https://img.shields.io/badge/python-3.10-blue.svg)
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
 Welcome to `pynajax`, a GPU accelerated backend for `pynapple` built on top on `JAX`.
