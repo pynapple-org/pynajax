@@ -5,7 +5,7 @@
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 
 
-pynajax is backend for [pynapple](https://github.com/pynapple-org/pynapple) in [jax](https://github.com/google/jax). It offers a fast acceleration for the core pynapple functions using CPU or GPU. 
+Welcome to `pynajax`, a GPU accelerated backend for [pynapple](https://github.com/pynapple-org/pynapple) built on top on [jax](https://github.com/google/jax). It offers a fast acceleration for the core pynapple functions using GPU. 
 
 __The package is under active development and more methods will be added in the future.__
 
