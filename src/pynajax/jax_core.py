@@ -128,6 +128,7 @@ def construct_nap(time, data, time_support, columns):
     return data
 
 
+@jax.jit
 def convolve_epoch(data, kernel):
     """Convolve a single continuous temporal epoch.
 
@@ -169,7 +170,7 @@ def convolve_intervals(data, kernel):
 
     Returns
     -------
-    pynapple.Tsd, pynapple.TsdFrame, pynapple.TsdTensor
+    : jax.ndarray
         Pynapple timeseries object with convolved data. If kernel is a 1-D array,
         the dimensions of the input data are retained. If kernel is a 2-D array,
         another (last) dimension is added to store convolution with every column of kernels.
@@ -187,13 +188,6 @@ def convolve_intervals(data, kernel):
 
 def convolve(data, kernel):
     """One-dimensional convolution."""
-    # Store extra information of the pynapple object to add back later
-    time = data.t
-    time_support = data.time_support
-
-    columns = None
-    if data.ndim == 2:
-        columns = data.columns
 
     # Perform convolution
     if kernel.ndim == 0:
@@ -205,5 +199,5 @@ def convolve(data, kernel):
         out = convolve_epoch(data.d, kernel)
     else:
         out = convolve_intervals(data, kernel)
-    # Recreate pynapple object
-    return construct_nap(time, out, time_support, columns)
+
+    return out
