@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pynajax"
+version = "0.1.0"
+authors = [{name = "pynajax authors"}]
+description = "A JAX backend for pynapple."
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["neuroscience", "jax-backend", "pynapple"]
+license = { file = "LICENSE" }
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10"
+]
+
+# Define dependencies for the project
+dependencies = [
+    'jax>=0.4',                     # Numerical computing library
+    'typing_extensions>=4.6',       # Typing extensions for Python
+    'pynapple @ git+https://github.com/pynapple-org/pynapple.git@pynajax',
+    'jaxlib'
+]
+
+
+
+# Configure package discovery for setuptools
+[tool.setuptools.packages.find]
+where = ["src"]             # The directory where package modules are located
+include = ["pynajax"] # The specific package(s) to include in the distribution
+
+
+# Define optional dependencies for the project
+[project.optional-dependencies]
+dev = [
+    "black",                        # Code formatter
+    "isort",                        # Import sorter
+    "pip-tools",                    # Dependency management
+    "pytest",                       # Testing framework
+    "flake8",                       # Code linter
+    "coverage",                     # Test coverage measurement
+    "pytest-cov",                   # Test coverage plugin for pytest
+    'matplotlib>=3.7',              # Plotting library
+]
