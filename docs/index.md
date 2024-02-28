@@ -6,6 +6,12 @@
 
 Welcome to `pynajax`, a GPU accelerated backend for `pynapple` built on top on `JAX`.
 
+__The package is under active development and more methods will be added in the future.__
+
+
+__For this package to work, `pynapple` must be installed from the branch `pynajax`.__
+
+
 ## Installation
 Run the following `pip` command in your virtual environment.
 
@@ -21,13 +27,24 @@ Run the following `pip` command in your virtual environment.
 
 ## Basic usage
 
-Once you install `pynajax` in your environment, you can set the `pynapple` backend to `JAX` as follows,
+To use pynajax, you need to change the pynapple backend using `nap.nap_config.set_backend`. See the example below : 
 
 ```python
 import pynapple as nap
-
+import numpy as np
 nap.nap_config.set_backend("jax")
+
+tsd = nap.Tsd(t=np.arange(100), d=np.random.randn(100))
+
+tsd.convolve(np.ones(11)) # This will run on GPU or CPU depending on the jax installation
 ```
+
+## Benchmarks
+
+This benchmark for the `convolve` function was run on a NVIDIA GeForce GTX 1060.
+
+![benchmark_convolve](./images/convolve_benchmark.png)
+
 
 ## Disclaimer
 
