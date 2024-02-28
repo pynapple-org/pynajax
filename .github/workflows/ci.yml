@@ -36,7 +36,7 @@ jobs:
       - name: Run nox
         run: |
           echo ${{ matrix.python-version }}
-          nox -s linters --install ruff
+          nox -s linters
           nox -s tests -p ${{ matrix.python-version }}
 
       - name: Upload coverage reports to Codecov
