@@ -9,6 +9,33 @@ _convolve_vec = jax.vmap(partial(jnp.convolve, mode="same"), (1, None), 1)
 _convolve_mat = jax.vmap(_convolve_vec, (None, 1), -1)
 
 
+@jax.jit
+def _reshape_convolve_2d_kernel(tensor, kernel):
+    shape_new = (*tensor.shape, kernel.shape[1])
+    return _convolve_mat(tensor.reshape(tensor.shape[0], -1), kernel).reshape(shape_new)
+
+
+@jax.jit
+def _reshape_convolve_1d_kernel(tensor, kernel):
+    return _convolve_vec(tensor.reshape(tensor.shape[0], -1), kernel).reshape(tensor.shape)
+
+
+@jax.jit
+def _jit_tree_convolve_2d_kernel(tree, kernel):
+    # Convolve each epoch
+    func = partial(_reshape_convolve_2d_kernel, kernel=kernel)
+    convolved_epochs = jax.tree_map(lambda x: func(x), tree)
+    return jnp.concatenate(jax.tree_leaves(convolved_epochs), axis=0)
+
+@jax.jit
+def _jit_tree_convolve_1d_kernel(tree, kernel):
+    # Convolve each epoch
+    func = partial(_reshape_convolve_1d_kernel, kernel=kernel)
+    convolved_epochs = jax.tree_map(lambda x: func(x), tree)
+    # Concatenate the convolved epochs
+    return jnp.concatenate(jax.tree_leaves(convolved_epochs), axis=0)
+
+
 def construct_nap(time, data, time_support, columns):
     """
 
@@ -52,15 +79,11 @@ def convolve_epoch(data, kernel):
     """
 
     # Store extra information of the pynapple object to add back later
-    orig_shape = data.shape
     time = data.t
     time_support = data.time_support
     columns = None
     if data.ndim == 2:
         columns = data.columns
-
-    # Flatten all dimensions except for the first (time) dimension
-    data = jnp.reshape(data.d, (data.shape[0], -1))
 
     # Perform convolution
     if kernel.ndim == 0:
@@ -68,9 +91,9 @@ def convolve_epoch(data, kernel):
             "Provide a kernel with at least 1 dimension, current kernel has 0 dimensions"
         )
     if kernel.ndim == 1:
-        data = _convolve_vec(data, kernel).reshape(orig_shape)
+        data = _jit_tree_convolve_1d_kernel(data.d, kernel)
     else:
-        data = _convolve_mat(data, kernel).reshape((*orig_shape, kernel.shape[1]))
+        data = _jit_tree_convolve_2d_kernel(data.d, kernel)
 
     # Recreate pynapple object
     data = construct_nap(time, data, time_support, columns)
@@ -98,14 +121,12 @@ def convolve_intervals(data, kernel):
     """
 
     # Create a tree of pynapple timeseries objects for each epoch
-    tree = [data.get(start, end) for start, end in data.time_support.values]
+    tree = [data.get(start, end).d for start, end in data.time_support.values]
 
-    # Convolve each epoch
-    func = partial(convolve_epoch, kernel=kernel)
-    convolved_epochs = jax.tree_map(lambda x: func(x).d, tree)
-
-    # Concatenate the convolved epochs
-    convolved_data = jnp.concatenate(convolved_epochs, axis=0)
+    if kernel.ndim == 1:
+        convolved_data = _jit_tree_convolve_1d_kernel(tree, kernel)
+    else:
+        convolved_data = _jit_tree_convolve_2d_kernel(tree, kernel)
 
     # Reconstruct the timeseries object
     columns = None
