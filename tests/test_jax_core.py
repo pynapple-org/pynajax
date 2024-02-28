@@ -25,15 +25,8 @@ def test_2d_convolve_epoch_vec(shape_array1, shape_array2):
         full_indices = (slice(None),) + indices
         res_numpy[full_indices] = np.convolve(arr1, arr2[full_indices], mode="same")
 
-    if arr2.ndim == 1:
-        arr2 = nap.Tsd(t=np.arange(arr2.shape[0]), d=jnp.asarray(arr2))
-    elif arr2.ndim == 2:
-        arr2 = nap.TsdFrame(t=np.arange(arr2.shape[0]), d=jnp.asarray(arr2))
-    else:
-        arr2 = nap.TsdTensor(t=np.arange(arr2.shape[0]), d=jnp.asarray(arr2))
-
-    res_pynajax = jnap.jax_core.convolve_epoch(arr2, arr1)
-    assert np.allclose(res_pynajax.d, res_numpy)
+    res_pynajax = jnap.jax_core.convolve_epoch(jnp.asarray(arr2), arr1)
+    assert np.allclose(res_pynajax, res_numpy)
 
 
 @pytest.mark.parametrize(
@@ -53,16 +46,9 @@ def test_2d_convolve_epoch_mat(shape_array1, shape_array2):
                 arr1[:, j], arr2[full_indices], mode="same"
             )
 
-    if arr2.ndim == 1:
-        arr2 = nap.Tsd(t=np.arange(arr2.shape[0]), d=jnp.asarray(arr2))
-    elif arr2.ndim == 2:
-        arr2 = nap.TsdFrame(t=np.arange(arr2.shape[0]), d=jnp.asarray(arr2))
-    else:
-        arr2 = nap.TsdTensor(t=np.arange(arr2.shape[0]), d=jnp.asarray(arr2))
-
     res_pynajax = jnap.jax_core.convolve_epoch(arr2, arr1)
-    assert np.allclose(res_pynajax.d, res_numpy)
-    assert isinstance(res_pynajax.d, jnp.ndarray)
+    assert np.allclose(res_pynajax, res_numpy)
+    assert isinstance(res_pynajax, jnp.ndarray)
 
 
 @pytest.mark.parametrize(
@@ -199,7 +185,7 @@ def test_convolve_intervals_columns(time, data, iset, kernel, columns, expectati
     """
     nap_data = pynajax.jax_core.construct_nap(time, data, iset, columns)
     print("here", type(nap_data.columns))
-    res = pynajax.jax_core.convolve_intervals(nap_data, kernel)
+    res = pynajax.jax_core.convolve(nap_data, kernel)
     with expectation:
         assert all(
             nap_data.columns[i] == res.columns[i] for i in range(len(nap_data.columns))

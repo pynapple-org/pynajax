@@ -146,25 +146,10 @@ def convolve_epoch(data, kernel):
         the dimensions of the input data are retained. If kernel is a 2-D array,
         another (last) dimension is added to store convolution with every column of kernels.
     """
-    # Store extra information of the pynapple object to add back later
-    time = data.t
-    time_support = data.time_support
-    columns = None
-    if data.ndim == 2:
-        columns = data.columns
-
-    # Perform convolution
-    if kernel.ndim == 0:
-        raise IOError(
-            "Provide a kernel with at least 1 dimension, current kernel has 0 dimensions"
-        )
     if kernel.ndim == 1:
-        data = _jit_tree_convolve_1d_kernel(data.d, kernel)
+        data = _jit_tree_convolve_1d_kernel(data, kernel)
     else:
-        data = _jit_tree_convolve_2d_kernel(data.d, kernel)
-
-    # Recreate pynapple object
-    data = construct_nap(time, data, time_support, columns)
+        data = _jit_tree_convolve_2d_kernel(data, kernel)
     return data
 
 
@@ -197,16 +182,28 @@ def convolve_intervals(data, kernel):
     else:
         convolved_data = _jit_tree_convolve_2d_kernel(tree, kernel)
 
-    # Reconstruct the timeseries object
-    columns = None
-    if kernel.ndim == 1 and hasattr(data, "columns"):
-        columns = data.columns
-
-    return construct_nap(data.t, convolved_data, data.time_support, columns)
+    return convolved_data
 
 
 def convolve(data, kernel):
     """One-dimensional convolution."""
+    # Store extra information of the pynapple object to add back later
+    time = data.t
+    time_support = data.time_support
+
+    columns = None
+    if data.ndim == 2:
+        columns = data.columns
+
+    # Perform convolution
+    if kernel.ndim == 0:
+        raise IOError(
+            "Provide a kernel with at least 1 dimension, current kernel has 0 dimensions"
+        )
+
     if len(data.time_support) == 1:
-        return convolve_epoch(data, kernel)
-    return convolve_intervals(data, kernel)
+        out = convolve_epoch(data.d, kernel)
+    else:
+        out = convolve_intervals(data, kernel)
+    # Recreate pynapple object
+    return construct_nap(time, out, time_support, columns)
