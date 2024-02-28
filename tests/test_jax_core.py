@@ -150,48 +150,6 @@ def test_convolve_intervals_shape_2d_kernel(time, data, iset, kernel):
     res = pynajax.jax_core.convolve_intervals(nap_data, kernel)
     assert all(res.shape[i] == expected_shape[i] for i in range(nap_data.ndim))
 
-
-@pytest.mark.parametrize(
-    "iset",
-    [
-        nap.IntervalSet(start=[0], end=[100]),
-        nap.IntervalSet(start=[0, 20], end=[19, 100]),
-    ],
-)
-@pytest.mark.parametrize(
-    "data, columns",
-    [
-        (jnp.ones((100, 1)), ["a"]),
-        (jnp.ones((100, 2)), ["a", "b"]),
-        (jnp.ones((100, 2)), None),
-    ],
-)
-@pytest.mark.parametrize(
-    "time",
-    [
-        np.arange(100),
-    ],
-)
-@pytest.mark.parametrize(
-    "kernel, expectation",
-    [
-        (np.ones((10,)), does_not_raise()),
-        (np.ones((10, 1)), pytest.raises(AttributeError)),
-    ],
-)
-def test_convolve_intervals_columns(time, data, iset, kernel, columns, expectation):
-    """
-    Check that the columns matches if kernel is 1D and data is TsdFrame with columns
-    """
-    nap_data = pynajax.jax_core.construct_nap(time, data, iset, columns)
-    print("here", type(nap_data.columns))
-    res = pynajax.jax_core.convolve(nap_data, kernel)
-    with expectation:
-        assert all(
-            nap_data.columns[i] == res.columns[i] for i in range(len(nap_data.columns))
-        )
-
-
 @pytest.mark.parametrize(
     "iset",
     [

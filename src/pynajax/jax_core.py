@@ -28,7 +28,9 @@ def _reshape_convolve_2d_kernel(tensor, kernel):
         The convolved tensor.
     """
     shape_new = (*tensor.shape, kernel.shape[1])
-    return _convolve_mat(tensor.reshape(tensor.shape[0], -1), kernel).reshape(shape_new)
+    return _convolve_mat(
+        tensor.reshape(tensor.shape[0], -1), kernel
+    ).reshape(shape_new)
 
 
 @jax.jit
@@ -48,7 +50,9 @@ def _reshape_convolve_1d_kernel(tensor, kernel):
     jax.numpy.ndarray:
         The convolved tensor.
     """
-    return _convolve_vec(tensor.reshape(tensor.shape[0], -1), kernel).reshape(tensor.shape)
+    return _convolve_vec(
+        tensor.reshape(tensor.shape[0], -1), kernel
+    ).reshape(tensor.shape)
 
 
 @jax.jit
@@ -59,7 +63,8 @@ def _jit_tree_convolve_2d_kernel(tree, kernel):
     Parameters
     ----------
     tree : Any
-        Tree of tensors (usually list of arrays, one array per epoch) to be convolved.
+        Tree of tensors (usually list of arrays, one array per epoch)
+        to be convolved.
     kernel : jax.numpy.ndarray
         The convolution kernel.
 
@@ -72,7 +77,7 @@ def _jit_tree_convolve_2d_kernel(tree, kernel):
     func = partial(_reshape_convolve_2d_kernel, kernel=kernel)
     convolved_epochs = jax.tree_map(lambda x: func(x), tree)
     # Concatenate leaves on the first axis and return
-    return jnp.concatenate(jax.tree_leaves(convolved_epochs), axis=0)
+    return jnp.concatenate(jax.tree.leaves(convolved_epochs), axis=0)
 
 
 @jax.jit
@@ -83,7 +88,8 @@ def _jit_tree_convolve_1d_kernel(tree, kernel):
     Parameters
     ----------
     tree : Any
-        Tree of tensors (usually list of arrays, one array per epoch) to be convolved.
+        Tree of tensors (usually list of arrays, one array per epoch) to
+        be convolved.
     kernel : jax.numpy.ndarray
         The convolution kernel.
 
@@ -96,7 +102,7 @@ def _jit_tree_convolve_1d_kernel(tree, kernel):
     func = partial(_reshape_convolve_1d_kernel, kernel=kernel)
     convolved_epochs = jax.tree_map(lambda x: func(x), tree)
     # Concatenate leaves on the first axis and return
-    return jnp.concatenate(jax.tree_leaves(convolved_epochs), axis=0)
+    return jnp.concatenate(jax.tree.leaves(convolved_epochs), axis=0)
 
 
 def construct_nap(time, data, time_support, columns):
@@ -122,7 +128,8 @@ def construct_nap(time, data, time_support, columns):
     if data.ndim == 1:
         data = nap.Tsd(t=time, d=data, time_support=time_support)
     elif data.ndim == 2:
-        data = nap.TsdFrame(t=time, d=data, columns=columns, time_support=time_support)
+        data = nap.TsdFrame(t=time, d=data, columns=columns,
+                            time_support=time_support)
     else:
         data = nap.TsdTensor(t=time, d=data, time_support=time_support)
     return data
@@ -143,9 +150,10 @@ def convolve_epoch(data, kernel):
     Returns
     -------
     pynapple.Tsd, pynapple.TsdFrame, pynapple.TsdTensor
-        Pynapple timeseries object with convolved data. If kernel is a 1-D array,
-        the dimensions of the input data are retained. If kernel is a 2-D array,
-        another (last) dimension is added to store convolution with every column of kernels.
+        Pynapple timeseries object with convolved data. If kernel
+        is a 1-D array, the dimensions of the input data are retained.
+        If kernel is a 2-D array,  another (last) dimension is added to
+        store convolution with every column of kernels.
     """
     if kernel.ndim == 1:
         data = _jit_tree_convolve_1d_kernel(data, kernel)
@@ -171,9 +179,10 @@ def convolve_intervals(data, kernel):
     Returns
     -------
     : jax.ndarray
-        Pynapple timeseries object with convolved data. If kernel is a 1-D array,
-        the dimensions of the input data are retained. If kernel is a 2-D array,
-        another (last) dimension is added to store convolution with every column of kernels.
+        Pynapple timeseries object with convolved data. If kernel is a
+        1-D array, the dimensions of the input data are retained. If kernel
+        is a 2-D array, another (last) dimension is added to store
+        convolution with every column of kernels.
     """
     # Create a tree of pynapple timeseries objects for each epoch
     tree = [data.get(start, end).d for start, end in data.time_support.values]
@@ -188,11 +197,11 @@ def convolve_intervals(data, kernel):
 
 def convolve(data, kernel):
     """One-dimensional convolution."""
-
     # Perform convolution
     if kernel.ndim == 0:
         raise IOError(
-            "Provide a kernel with at least 1 dimension, current kernel has 0 dimensions"
+            "Provide a kernel with at least 1 dimension, current kernel has "
+            "0 dimensions"
         )
 
     if len(data.time_support) == 1:
