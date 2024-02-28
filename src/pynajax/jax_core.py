@@ -4,7 +4,6 @@ from functools import partial
 
 import jax
 import jax.numpy as jnp
-import numpy as np
 import pynapple as nap
 
 _convolve_vec = jax.vmap(partial(jnp.convolve, mode="same"), (1, None), 1)
@@ -208,6 +207,6 @@ def convolve_intervals(data, kernel):
 
 def convolve(data, kernel):
     """One-dimensional convolution."""
-    if len(data.time_support) > 1:
+    if len(data.time_support) == 1:
         return convolve_epoch(data, kernel)
     return convolve_intervals(data, kernel)
