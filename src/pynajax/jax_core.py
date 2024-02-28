@@ -77,7 +77,7 @@ def _jit_tree_convolve_2d_kernel(tree, kernel):
     func = partial(_reshape_convolve_2d_kernel, kernel=kernel)
     convolved_epochs = jax.tree_map(lambda x: func(x), tree)
     # Concatenate leaves on the first axis and return
-    return jnp.concatenate(jax.tree_leaves(convolved_epochs), axis=0)
+    return jnp.concatenate(jax.tree.leaves(convolved_epochs), axis=0)
 
 
 @jax.jit
@@ -102,7 +102,7 @@ def _jit_tree_convolve_1d_kernel(tree, kernel):
     func = partial(_reshape_convolve_1d_kernel, kernel=kernel)
     convolved_epochs = jax.tree_map(lambda x: func(x), tree)
     # Concatenate leaves on the first axis and return
-    return jnp.concatenate(jax.tree_leaves(convolved_epochs), axis=0)
+    return jnp.concatenate(jax.tree.leaves(convolved_epochs), axis=0)
 
 
 def construct_nap(time, data, time_support, columns):
