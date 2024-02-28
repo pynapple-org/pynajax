@@ -10,8 +10,21 @@ pynajax is backend for [pynapple](https://github.com/pynapple-org/pynapple) in [
 __The package is under active development and more methods will be added in the future.__
 
 
-## Installation
+__For this package to work, `pynapple` must be installed from the branch `pynajax`.__
 
+
+## Installation
+Run the following `pip` command in your virtual environment.
+
+**For macOS/Linux users:**
+ ```bash
+ pip install git+https://github.com/pynapple-org/pynajax.git
+ ```
+
+**For Windows users:**
+ ```
+ python -m pip install git+https://github.com/pynapple-org/pynajax.git
+ ```
 
 
 ## Basic usage
@@ -33,3 +46,10 @@ tsd.convolve(np.ones(11)) # This will run on GPU or CPU depending on the jax ins
 This benchmark for the `convolve` function was run on a NVIDIA GeForce GTX 1060.
 
 ![benchmark_convolve](./benchmarks/convolve_benchmark.png)
+
+## Disclaimer
+
+Please note that this package is currently under development. While you can
+download and test the functionalities that are already present, please be aware
+that syntax and functionality may change before our preliminary release.
+
