@@ -1,7 +1,7 @@
 import nox
 
 
-@nox.session(name="tests", python=["3.10", "3.11", "3.12"])
+@nox.session(name="tests")
 def tests(session):
     """Run the test suite."""
     session.run("pytest")

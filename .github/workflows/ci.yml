@@ -35,7 +35,7 @@ jobs:
       - name: Run nox
         run: |
           nox --no-venv -s linters
-          nox --no-venv -s tests -p ${{ matrix.python-version }}
+          nox --no-venv -s tests
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
