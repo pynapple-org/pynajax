@@ -62,7 +62,7 @@ def restrict_mixed(time_array, data_array, starts, ends):
 
 if __name__ == "__main__":
 	from time import perf_counter
-	T = 10000
+	T = 50000
 	time_array = np.arange(T)
 	data_array = np.arange(2*T).reshape(T, 2)
 	starts = np.arange(1, T-1, 20)
