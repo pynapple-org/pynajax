@@ -65,8 +65,11 @@ if __name__ == "__main__":
 	T = 10000
 	time_array = np.arange(T)
 	data_array = np.arange(2*T).reshape(T, 2)
-	starts = np.arange(1, T, 20)
-	ends = np.arange(1, T, 20)
+	starts = np.arange(1, T-1, 20)
+	ends = np.arange(1, T-1, 20) + 2
+
+	ep = nap.IntervalSet(start=starts, end=ends)
+	tsd = nap.TsdFrame(t=time_array, d=data_array)
 
 	restrict(time_array, data_array, starts, ends)
 	t0 = perf_counter()
@@ -77,3 +80,8 @@ if __name__ == "__main__":
 	t0 = perf_counter()
 	restrict_mixed(time_array, data_array, starts, ends)
 	print("restrict_mixed", perf_counter()-t0)
+
+	tsd.restrict(ep)
+	t0 = perf_counter()
+	tsd.restrict(ep)
+	print("pynapple restrict", perf_counter() - t0)
