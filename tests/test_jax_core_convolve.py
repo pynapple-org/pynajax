@@ -6,10 +6,10 @@ import pynapple as nap
 import pytest
 
 import pynajax as jnap
-import pynajax.jax_core
+import pynajax.jax_core_convolve
 from contextlib import nullcontext as does_not_raise
 
-nap.nap_config.set_backend("jax")
+nap.config.nap_config.set_backend("jax")
 
 @pytest.mark.parametrize(
     "shape_array1, shape_array2", [((3,), (10, 2)), ((3,), (10, 2, 3))]
@@ -25,7 +25,7 @@ def test_2d_convolve_epoch_vec(shape_array1, shape_array2):
         full_indices = (slice(None),) + indices
         res_numpy[full_indices] = np.convolve(arr1, arr2[full_indices], mode="same")
 
-    res_pynajax = jnap.jax_core.convolve_epoch(jnp.asarray(arr2), arr1)
+    res_pynajax = jnap.jax_core_convolve.convolve_epoch(jnp.asarray(arr2), arr1)
     assert np.allclose(res_pynajax, res_numpy)
 
 
@@ -46,7 +46,7 @@ def test_2d_convolve_epoch_mat(shape_array1, shape_array2):
                 arr1[:, j], arr2[full_indices], mode="same"
             )
 
-    res_pynajax = jnap.jax_core.convolve_epoch(arr2, arr1)
+    res_pynajax = jnap.jax_core_convolve.convolve_epoch(arr2, arr1)
     assert np.allclose(res_pynajax, res_numpy)
     assert isinstance(res_pynajax, jnp.ndarray)
 
@@ -81,8 +81,8 @@ def test_2d_convolve_epoch_mat(shape_array1, shape_array2):
 )
 def test_convolve_intervals(time, data, iset, kernel):
     """Run convolution on single and multi interval."""
-    nap_data = pynajax.jax_core.construct_nap(time, data, iset, None)
-    pynajax.jax_core.convolve_intervals(nap_data, kernel)
+    nap_data = pynajax.jax_core_convolve.construct_nap(time, data, iset, None)
+    pynajax.jax_core_convolve.convolve_intervals(nap_data, kernel)
 
 
 @pytest.mark.parametrize(
@@ -110,9 +110,9 @@ def test_convolve_intervals(time, data, iset, kernel):
 )
 def test_convolve_intervals_shape_1d_kernel(time, data, iset, kernel):
     """Check that the shape of input and output matches if kernel is 1D."""
-    nap_data = pynajax.jax_core.construct_nap(time, data, iset, None)
+    nap_data = pynajax.jax_core_convolve.construct_nap(time, data, iset, None)
     expected_shape = nap_data.shape
-    res = pynajax.jax_core.convolve_intervals(nap_data, kernel)
+    res = pynajax.jax_core_convolve.convolve_intervals(nap_data, kernel)
     assert all(res.shape[i] == expected_shape[i] for i in range(nap_data.ndim))
 
 
@@ -145,9 +145,9 @@ def test_convolve_intervals_shape_2d_kernel(time, data, iset, kernel):
     Check that the shape of output is equal to that of the input
     plus the second dimension of the kernel attached at the end.
     """
-    nap_data = pynajax.jax_core.construct_nap(time, data, iset, None)
+    nap_data = pynajax.jax_core_convolve.construct_nap(time, data, iset, None)
     expected_shape = (*nap_data.shape, kernel.shape[1])
-    res = pynajax.jax_core.convolve_intervals(nap_data, kernel)
+    res = pynajax.jax_core_convolve.convolve_intervals(nap_data, kernel)
     assert all(res.shape[i] == expected_shape[i] for i in range(nap_data.ndim))
 
 @pytest.mark.parametrize(
@@ -180,7 +180,7 @@ def test_convolve_construct_nap_type(time, data, iset, kernel):
     Check that the shape of output is equal to that of the input
     plus the second dimension of the kernel attached at the end.
     """
-    nap_data = pynajax.jax_core.construct_nap(time, data, iset, None)
+    nap_data = pynajax.jax_core_convolve.construct_nap(time, data, iset, None)
     assert isinstance(nap_data.d, jnp.ndarray)
 
 
@@ -206,7 +206,7 @@ def test_construct_nap_type(time, data, iset):
     Check that the shape of output is equal to that of the input
     plus the second dimension of the kernel attached at the end.
     """
-    nap_data = pynajax.jax_core.construct_nap(time, data, iset, None)
+    nap_data = pynajax.jax_core_convolve.construct_nap(time, data, iset, None)
     assert isinstance(nap_data.d, jnp.ndarray)
 
 
@@ -235,7 +235,7 @@ def test_construct_nap_columns(time, data, iset, columns):
     """
     Check that construct nap defines the proper columns for TsdFrame.
     """
-    nap_data = pynajax.jax_core.construct_nap(time, data, iset, columns)
+    nap_data = pynajax.jax_core_convolve.construct_nap(time, data, iset, columns)
     if columns is None:
         columns = range(data.shape[1])
     assert set(nap_data.columns) == set(columns)

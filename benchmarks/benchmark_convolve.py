@@ -5,7 +5,7 @@ import pytest
 import jax
 import jax.numpy as jnp
 from time import perf_counter
-from pynajax.jax_core import convolve_epoch
+from pynajax.jax_core_convolve import convolve_epoch
 from matplotlib.pyplot import *
 
 jax_times = []
