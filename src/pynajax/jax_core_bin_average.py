@@ -149,7 +149,7 @@ def jit_average(bins, data, edges):
     counts = jnp.zeros(n_bins).at[bins].add(1)
 
     # Calculate averages, safely handling divisions by zero.
-    average = (sums.T / counts).T#jnp.divide(sums.T, counts, where=counts != 0).T
+    average = (sums.T / counts).T
     return average
 
 
