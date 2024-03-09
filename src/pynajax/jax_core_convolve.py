@@ -28,9 +28,7 @@ def _reshape_convolve_2d_kernel(tensor, kernel):
         The convolved tensor.
     """
     shape_new = (*tensor.shape, kernel.shape[1])
-    return _convolve_mat(
-        tensor.reshape(tensor.shape[0], -1), kernel
-    ).reshape(shape_new)
+    return _convolve_mat(tensor.reshape(tensor.shape[0], -1), kernel).reshape(shape_new)
 
 
 @jax.jit
@@ -50,9 +48,9 @@ def _reshape_convolve_1d_kernel(tensor, kernel):
     jax.numpy.ndarray:
         The convolved tensor.
     """
-    return _convolve_vec(
-        tensor.reshape(tensor.shape[0], -1), kernel
-    ).reshape(tensor.shape)
+    return _convolve_vec(tensor.reshape(tensor.shape[0], -1), kernel).reshape(
+        tensor.shape
+    )
 
 
 @jax.jit
@@ -128,8 +126,7 @@ def construct_nap(time, data, time_support, columns):
     if data.ndim == 1:
         data = nap.Tsd(t=time, d=data, time_support=time_support)
     elif data.ndim == 2:
-        data = nap.TsdFrame(t=time, d=data, columns=columns,
-                            time_support=time_support)
+        data = nap.TsdFrame(t=time, d=data, columns=columns, time_support=time_support)
     else:
         data = nap.TsdTensor(t=time, d=data, time_support=time_support)
     return data

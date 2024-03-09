@@ -1,8 +1,8 @@
 import jax
 import jax.numpy as jnp
-from numba import jit
 import numpy as np
 import pynapple as nap
+from numba import jit
 
 _NAP_TIME_PRECISION = 10 ** (-nap.config.nap_config.time_index_precision)
 
@@ -137,7 +137,7 @@ def _get_bin_edges(time_array, starts, ends, bin_size):
         t = maxt
         k += 1
 
-    return ix, edges[:edge_idx], in_epoch[:edge_idx-1]
+    return ix, edges[:edge_idx], in_epoch[: edge_idx - 1]
 
 
 @jax.jit
@@ -180,12 +180,12 @@ def bin_average(time_array, data_array, starts, ends, bin_size):
     # Calculate bin edges and identify time points within epochs for averaging.
     t0 = perf_counter()
     ix, edges, in_epoch = _get_bin_edges(time_array, starts, ends, bin_size=bin_size)
-    print("get edges", perf_counter()-t0)
+    print("get edges", perf_counter() - t0)
 
     # Digitize time points to find corresponding bins, adjusting indices to be 0-based.
     t0 = perf_counter()
     bins = np.digitize(time_array[ix], edges) - 1
-    print("digitize", perf_counter()-t0)
+    print("digitize", perf_counter() - t0)
 
     t0 = perf_counter()
     average = jit_average(bins, data_array[ix], edges)
@@ -196,18 +196,18 @@ def bin_average(time_array, data_array, starts, ends, bin_size):
     return time_array_new[in_epoch], average[in_epoch]
 
 
-
 if __name__ == "__main__":
     from time import perf_counter
+
     import pynapple as nap
 
     T = 101987
-    time_array = np.arange(T)/2
-    data_array = np.arange(2*T).reshape(T, 2)
-    starts = np.arange(1, T//2-1, 20)
-    ends = np.arange(1, T//2-1, 20) + 8
+    time_array = np.arange(T) / 2
+    data_array = np.arange(2 * T).reshape(T, 2)
+    starts = np.arange(1, T // 2 - 1, 20)
+    ends = np.arange(1, T // 2 - 1, 20) + 8
 
-    bin_size = 7.
+    bin_size = 7.0
 
     ep = nap.IntervalSet(start=starts, end=ends)
     tsd = nap.TsdFrame(t=time_array, d=data_array.copy())
