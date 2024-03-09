@@ -103,7 +103,7 @@ def _get_bin_edges(time_array, starts, ends, bin_size):
             nb_bins[k] = 1
 
     # Initialize arrays for bin edges and their epoch inclusion status.
-    nb = np.sum(nb_bins + starts.shape[0])
+    nb = np.sum(nb_bins) + starts.shape[0]
     edges = np.zeros(nb, dtype=np.float64)
     in_epoch = np.ones(nb, dtype=np.bool_)
 
@@ -153,6 +153,47 @@ def jit_average(bins, data, edges):
     return average
 
 
+@jit(nopython=True)
+def jitrestrict_with_count(time_array, starts, ends):
+    n = len(time_array)
+    m = len(starts)
+    ix = np.zeros(n, dtype=np.bool_)
+    count = np.zeros(m, dtype=np.int64)
+
+    k = 0
+    t = 0
+
+    while ends[k] < time_array[t]:
+        k += 1
+
+    while k < m:
+        # Outside
+        while t < n:
+            if time_array[t] >= starts[k]:
+                # ix[t] = True
+                # count[k] += 1
+                # t += 1
+                break
+            t += 1
+
+        # Inside
+        while t < n:
+            if time_array[t] > ends[k]:
+                k += 1
+                break
+            else:
+                ix[t] = True
+                count[k] += 1
+            t += 1
+
+        if k == m:
+            break
+        if t == n:
+            break
+
+    return ix, count
+
+
 def bin_average(time_array, data_array, starts, ends, bin_size):
     """
     Perform bin-averaging of data array based on time array within specified epochs.
@@ -178,18 +219,11 @@ def bin_average(time_array, data_array, starts, ends, bin_size):
         New data array containing the averaged values.
     """
     # Calculate bin edges and identify time points within epochs for averaging.
-    t0 = perf_counter()
     ix, edges, in_epoch = _get_bin_edges(time_array, starts, ends, bin_size=bin_size)
-    print("get edges", perf_counter() - t0)
 
     # Digitize time points to find corresponding bins, adjusting indices to be 0-based.
-    t0 = perf_counter()
     bins = np.digitize(time_array[ix], edges) - 1
-    print("digitize", perf_counter() - t0)
-
-    t0 = perf_counter()
     average = jit_average(bins, data_array[ix], edges)
-    print("jax jit average", perf_counter() - t0)
 
     # Create a new time array with bin centers, and filter by in-epoch bins.
     time_array_new = edges[:-1] + bin_size / 2
