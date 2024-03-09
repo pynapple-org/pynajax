@@ -62,15 +62,16 @@ def restrict_mixed(time_array, data_array, starts, ends):
 
 if __name__ == "__main__":
 	from time import perf_counter
-	T = 50000
+	T = 100000
 	time_array = np.arange(T)
 	data_array = np.arange(2*T).reshape(T, 2)
 	starts = np.arange(1, T-1, 20)
 	ends = np.arange(1, T-1, 20) + 2
 
 	ep = nap.IntervalSet(start=starts, end=ends)
-	tsd = nap.TsdFrame(t=time_array, d=data_array)
+	tsd = nap.TsdFrame(t=time_array, d=data_array.copy())
 
+	data_array = jnp.asarray(data_array)
 	restrict(time_array, data_array, starts, ends)
 	t0 = perf_counter()
 	restrict(time_array, data_array, starts, ends)
