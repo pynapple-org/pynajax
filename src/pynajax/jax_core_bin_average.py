@@ -6,6 +6,7 @@ import pynapple as nap
 
 _NAP_TIME_PRECISION = 10 ** (-nap.config.nap_config.time_index_precision)
 
+
 @jit(nopython=True)
 def _get_mask_and_count(time_array, starts, ends):
     """
@@ -139,6 +140,19 @@ def _get_bin_edges(time_array, starts, ends, bin_size):
     return ix, edges[:edge_idx], in_epoch[:edge_idx-1]
 
 
+@jax.jit
+def jit_average(bins, data, edges):
+
+    # Initialize arrays for sums and counts per bin, and perform bin-wise addition.
+    n_bins = len(edges) - 1
+    sums = jnp.zeros((n_bins, *data_array.shape[1:])).at[bins].add(data)
+    counts = jnp.zeros(n_bins).at[bins].add(1)
+
+    # Calculate averages, safely handling divisions by zero.
+    average = (sums.T / counts).T#jnp.divide(sums.T, counts, where=counts != 0).T
+    return average
+
+
 def bin_average(time_array, data_array, starts, ends, bin_size):
     """
     Perform bin-averaging of data array based on time array within specified epochs.
@@ -164,24 +178,22 @@ def bin_average(time_array, data_array, starts, ends, bin_size):
         New data array containing the averaged values.
     """
     # Calculate bin edges and identify time points within epochs for averaging.
+    t0 = perf_counter()
     ix, edges, in_epoch = _get_bin_edges(time_array, starts, ends, bin_size=bin_size)
+    print("get edges", perf_counter()-t0)
 
     # Digitize time points to find corresponding bins, adjusting indices to be 0-based.
+    t0 = perf_counter()
     bins = np.digitize(time_array[ix], edges) - 1
+    print("digitize", perf_counter()-t0)
 
-    # Initialize arrays for sums and counts per bin, and perform bin-wise addition.
-    n_bins = len(edges) - 1
-    sums = jnp.zeros((n_bins, *data_array.shape[1:])).at[bins].add(data_array[ix])
-    counts = jnp.zeros(n_bins).at[bins].add(1)
-
-    # Calculate averages, safely handling divisions by zero.
-    average = np.divide(sums.T, counts, out=np.zeros_like(sums.T), where=counts != 0).T
+    t0 = perf_counter()
+    average = jit_average(bins, data_array[ix], edges)
+    print("jax jit average", perf_counter() - t0)
 
     # Create a new time array with bin centers, and filter by in-epoch bins.
     time_array_new = edges[:-1] + bin_size / 2
-    time_array_new = time_array_new[in_epoch]
-    data_array_new = average[in_epoch]
-    return time_array_new, data_array_new
+    return time_array_new[in_epoch], average[in_epoch]
 
 
 
