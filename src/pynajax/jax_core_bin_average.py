@@ -208,7 +208,7 @@ if __name__ == "__main__":
 
     T = 1001987
     time_array = np.arange(T) / 2
-    data_array = np.arange(8 * T).reshape(T, 2, 2, 2)
+    data_array = np.arange(16 * T).reshape(T, 4, 2, 2)
     starts = np.arange(1, T // 2 - 1, 20)
     ends = np.arange(1, T // 2 - 1, 20) + 8
 
@@ -239,18 +239,18 @@ if __name__ == "__main__":
     print("pynapple jitbin_array", perf_counter() - t0)
 
     # timeit
-    t0 = perf_counter()
-    idx_start = jnp.searchsorted(time_array, starts)
-    idx_end = jnp.searchsorted(time_array, ends)
-    edges = jnp.zeros(len(ends) * 2, dtype=jnp.int32).at[jnp.arange(0, len(ends) * 2, 2)].set(idx_start).at[
-        jnp.arange(1, len(ends) * 2, 2)].set(idx_end)
+    # t0 = perf_counter()
+    # idx_start = jnp.searchsorted(time_array, starts)
+    # idx_end = jnp.searchsorted(time_array, ends)
+    # edges = jnp.zeros(len(ends) * 2, dtype=jnp.int32).at[jnp.arange(0, len(ends) * 2, 2)].set(idx_start).at[
+    #     jnp.arange(1, len(ends) * 2, 2)].set(idx_end)
 
-    aa = [data_array[s:e] for s, e in zip(idx_start, idx_end)]
-    print("list comprehension", perf_counter()-t0)
+    # aa = [data_array[s:e] for s, e in zip(idx_start, idx_end)]
+    # print("list comprehension", perf_counter()-t0)
 
-    t0 = perf_counter()
-    bb = get_list_splits(time_array, data_array,starts, ends)
-    print("jax array_split", perf_counter() - t0)
+    # t0 = perf_counter()
+    # bb = get_list_splits(time_array, data_array,starts, ends)
+    # print("jax array_split", perf_counter() - t0)
 
     # timeit
     # t0 = perf_counter()
