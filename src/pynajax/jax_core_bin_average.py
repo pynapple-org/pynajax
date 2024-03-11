@@ -148,50 +148,8 @@ def jit_average(bins, data, edges):
     sums = jnp.zeros((n_bins, *data_array.shape[1:])).at[bins].add(data)
     counts = jnp.zeros(n_bins).at[bins].add(1)
 
-    # Calculate averages, safely handling divisions by zero.
     average = (sums.T / counts).T
     return average
-
-
-@jit(nopython=True)
-def jitrestrict_with_count(time_array, starts, ends):
-    n = len(time_array)
-    m = len(starts)
-    ix = np.zeros(n, dtype=np.bool_)
-    count = np.zeros(m, dtype=np.int64)
-
-    k = 0
-    t = 0
-
-    while ends[k] < time_array[t]:
-        k += 1
-
-    while k < m:
-        # Outside
-        while t < n:
-            if time_array[t] >= starts[k]:
-                # ix[t] = True
-                # count[k] += 1
-                # t += 1
-                break
-            t += 1
-
-        # Inside
-        while t < n:
-            if time_array[t] > ends[k]:
-                k += 1
-                break
-            else:
-                ix[t] = True
-                count[k] += 1
-            t += 1
-
-        if k == m:
-            break
-        if t == n:
-            break
-
-    return ix, count
 
 
 def bin_average(time_array, data_array, starts, ends, bin_size):
@@ -230,21 +188,34 @@ def bin_average(time_array, data_array, starts, ends, bin_size):
     return time_array_new[in_epoch], average[in_epoch]
 
 
+def get_list_splits(time_array, data_array, starts, ends):
+    idx_start = jnp.searchsorted(time_array, starts)
+    idx_end = jnp.searchsorted(time_array, ends)
+    edges = jnp.zeros(len(ends) * 2, dtype=jnp.int32).at[jnp.arange(0, len(ends) * 2, 2)].set(idx_start).at[
+        jnp.arange(1, len(ends) * 2, 2)].set(idx_end)
+    return jnp.array_split(data_array, edges, axis=0)[1::2]
+
+
+def set_val(arr, data, index):
+    return arr.at[:index[1]-index[0]].set(data[index[0]:index[1]])
+
+
 if __name__ == "__main__":
     from time import perf_counter
+    from pynapple.core._jitted_functions import jitbin_array
 
     import pynapple as nap
 
-    T = 101987
+    T = 1001987
     time_array = np.arange(T) / 2
-    data_array = np.arange(2 * T).reshape(T, 2)
+    data_array = np.arange(8 * T).reshape(T, 2, 2, 2)
     starts = np.arange(1, T // 2 - 1, 20)
     ends = np.arange(1, T // 2 - 1, 20) + 8
 
     bin_size = 7.0
 
     ep = nap.IntervalSet(start=starts, end=ends)
-    tsd = nap.TsdFrame(t=time_array, d=data_array.copy())
+    tsd = nap.TsdTensor(t=time_array, d=data_array.copy())
 
     data_array = jnp.asarray(data_array)
 
@@ -261,3 +232,35 @@ if __name__ == "__main__":
     t0 = perf_counter()
     tsd.bin_average(bin_size=bin_size, ep=ep)
     print("pynapple bin_average", perf_counter() - t0)
+
+    jitbin_array(time_array, tsd.d, starts, ends, bin_size)
+    t0 = perf_counter()
+    jitbin_array(time_array, tsd.d, starts, ends, bin_size)
+    print("pynapple jitbin_array", perf_counter() - t0)
+
+    # timeit
+    t0 = perf_counter()
+    idx_start = jnp.searchsorted(time_array, starts)
+    idx_end = jnp.searchsorted(time_array, ends)
+    edges = jnp.zeros(len(ends) * 2, dtype=jnp.int32).at[jnp.arange(0, len(ends) * 2, 2)].set(idx_start).at[
+        jnp.arange(1, len(ends) * 2, 2)].set(idx_end)
+
+    aa = [data_array[s:e] for s, e in zip(idx_start, idx_end)]
+    print("list comprehension", perf_counter()-t0)
+
+    t0 = perf_counter()
+    bb = get_list_splits(time_array, data_array,starts, ends)
+    print("jax array_split", perf_counter() - t0)
+
+    # timeit
+    # t0 = perf_counter()
+    # mx = jnp.max(idx_end - idx_start)
+    # n_epoch = len(starts)
+    # idx_start = jnp.searchsorted(time_array, starts)
+    # idx_end = jnp.searchsorted(time_array, ends)
+    # indexes = jnp.zeros((n_epoch, 2), dtype=jnp.int32).at[:, 0].set(idx_start).at[:, 1].set(idx_end)
+    # array = jnp.zeros((mx, *data_array.shape[1:]))
+    # chunked_array = jax.vmap(lambda x: set_val(array, data_array, x), in_axes=0, out_axes=0)(indexes)
+
+
+
