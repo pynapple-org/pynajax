@@ -204,34 +204,3 @@ def sta_single_epoch(count_array, data_array, window, batch_size=256):
     else:
         res = _batched_dot_prod_feature(data_array, rolled_counts, batch_size, window, shape)
     return res
-
-if __name__ == "__main__":
-    import matplotlib.pyplot as plt
-
-    dataset = nap.load_file("/Users/ebalzani/Code/generalized-linear-models/docs/data/m691l1.nwb")
-
-    epochs = dataset["epochs"]
-    units = dataset["units"]
-    stimulus = dataset["whitenoise"]
-
-    spikes = units[[34]]
-    counts = spikes.count(0.01)
-
-    stimulus = fill_forward(counts, stimulus)
-
-    ws = 10
-
-
-    bs = 256
-    result = sta_single_epoch(counts, stimulus, ws, batch_size=bs)
-
-    #res = sta_single_epoch(counts.d, stimulus.d, window)
-    fig, axs = plt.subplots(1, ws)
-    for k in range(ws):
-        axs[k].imshow(result[k, 0])
-        axs[k].set_xticks([])
-        axs[k].set_yticks([])
-
-
-    #res = jitperievent_trigger_average(time_array, count_array, time_target_array, np.expand_dims(data_target_array, -1), starts, ends, windows, binsize)
-
