@@ -161,65 +161,52 @@ dot_prod_neu = jax.vmap(dot_prod, in_axes=(2, None), out_axes=1)
 # [(n_shift, T, n_neurons), (T, n_features)] -> (n_shift, n_neurons, n_features)
 dot_prod_feature = jax.vmap(dot_prod_neu, in_axes=(None, 1), out_axes=2)
 
-def sta_single_epoch(count_array, data_array, window):
+
+def _batched_dot_prod_feature(data_array, count_array, batch_size, window, shape):
+    num_full_batches = data_array.shape[1] // batch_size
+    carry = 0
+
+    def scan_fn(carry, x):
+        slc = jax.lax.dynamic_slice(data_array, (0, carry), (data_array.shape[0], batch_size))
+        batch_result = dot_prod_feature(count_array, slc)
+        return carry + batch_size, batch_result
+
+    _, res = jax.lax.scan(scan_fn, carry, None, length=num_full_batches)
+
+    res = jnp.transpose(res, (1, 2, 0, 3))  # move features at the end
+    res = res.reshape(*res.shape[:-2],-1) # flatten features
+
+    extra_elements = data_array.shape[1] % batch_size
+    if extra_elements:
+        # compute residual slice
+        resid = dot_prod_feature(count_array, data_array[:, -extra_elements:])
+        resid = resid.transpose(1, 2, 0).reshape(*res.shape[:-1], -1)
+        res = np.concatenate([res, resid], axis=2)
+
+    # reshape back to original and return
+    return res.reshape((window + 1, count_array.shape[2], *shape[1:]))
+
+
+def _dot_prod_feature_and_reshape(data_array, count_array, window, shape):
+    res = dot_prod_feature(count_array, data_array)
+    res.reshape((window + 1, count_array.shape[2], *shape[1:]))
+    return res
+
+
+def sta_single_epoch(count_array, data_array, window, batch_size=256):
     count_array = jnp.asarray(count_array, dtype=float)
     data_array = jnp.asarray(data_array, dtype=float)
     shape = data_array.shape
     data_array = data_array.reshape(data_array.shape[0], -1)
     rolled_counts = pad_and_roll(count_array, window)
-
-    result = dot_prod_feature(rolled_counts, data_array)
-    return result.reshape((window + 1, count_array.shape[1], *shape[1:]))
+    if batch_size >= data_array.shape[1]:
+        res = _dot_prod_feature_and_reshape(data_array, rolled_counts, window, shape)
+    else:
+        res = _batched_dot_prod_feature(data_array, rolled_counts, batch_size, window, shape)
+    return res
 
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
-    ep = nap.IntervalSet(0, 100)
-    feature = nap.Tsd(
-        t=np.arange(0, 101, 0.01), d=np.sin(np.arange(int(101 / 0.01))/10), time_support=ep
-    )
-    t1 = np.arange(1, 100)
-    x = np.arange(100, 10000, 100)
-    feature[x] = 1.0
-    group = nap.TsGroup(
-        {0: nap.Ts(t1), 1: nap.Ts(t1 - 0.1), 2: nap.Ts(t1 + 0.2)}, time_support=ep
-    )
-    binsize=0.2
-    time_unit = "s"
-    windowsize = (0.6, 0.6)
-
-    ## precomputation
-    binsize = nap.TsIndex.format_timestamps(
-        np.array([binsize], dtype=np.float64), time_unit
-    )[0]
-    start = np.abs(
-        nap.TsIndex.format_timestamps(
-            np.array([windowsize[0]], dtype=np.float64), time_unit
-        )[0]
-    )
-    end = np.abs(
-        nap.TsIndex.format_timestamps(
-            np.array([windowsize[1]], dtype=np.float64), time_unit
-        )[0]
-    )
-
-    idx1 = -np.arange(0, start + binsize, binsize)[::-1][:-1]
-    idx2 = np.arange(0, end + binsize, binsize)[1:]
-    time_idx = np.hstack((idx1, np.zeros(1), idx2))
-
-    eta = np.zeros((time_idx.shape[0], len(group), *feature.shape[1:]))
-
-    windows = np.array([len(idx1), len(idx2)])
-
-    # Bin the spike train
-    count = group.count(binsize, ep)
-
-    time_array = np.round(count.index.values - (binsize / 2), 9)
-    count_array = count.values
-    starts = ep.start
-    ends = ep.end
-
-    time_target_array = feature.index.values
-    data_target_array = feature.values
 
     dataset = nap.load_file("/Users/ebalzani/Code/generalized-linear-models/docs/data/m691l1.nwb")
 
@@ -232,11 +219,19 @@ if __name__ == "__main__":
 
     stimulus = fill_forward(counts, stimulus)
 
-    window = 10
-    res = sta_single_epoch(counts.d, stimulus.d, window)
-    fig, axs = plt.subplots(1, window)
-    for k in range(window):
-        axs[k].imshow(res[k, 0])
-    plt.tight_layout()
+    ws = 10
+
+
+    bs = 256
+    result = sta_single_epoch(counts, stimulus, ws, batch_size=bs)
+
+    #res = sta_single_epoch(counts.d, stimulus.d, window)
+    fig, axs = plt.subplots(1, ws)
+    for k in range(ws):
+        axs[k].imshow(result[k, 0])
+        axs[k].set_xticks([])
+        axs[k].set_yticks([])
+
+
     #res = jitperievent_trigger_average(time_array, count_array, time_target_array, np.expand_dims(data_target_array, -1), starts, ends, windows, binsize)
 
