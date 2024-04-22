@@ -234,11 +234,52 @@ def sta_multi_epoch(time_array, starts, ends, count_array, data_array, window, b
         results = sta_single_epoch(cnt, dat, window, batch_size=batch_size)
         return results
 
+    frac_duration = (idx_end - idx_start) / jnp.sum(idx_end - idx_start)
     res = sum(
-        jnp.divide(
-            jax.tree_map(sta, tree_count, tree_data),
-            (idx_end - idx_start) / jnp.sum(idx_end - idx_start)
-        )
+        [
+            sta_res / frac_duration[k] for k, sta_res in enumerate(jax.tree_map(sta, tree_count, tree_data))
+        ]
+    )
+
+    return res
+
+
+def sta_multi_epoch_fast(time_array, starts, ends, count_array, data_array, window, batch_size=256):
+    """
+    Compute a multi-epoch STA with a loop over epochs.
+
+    Parameters
+    ----------
+    time_array
+    starts
+    ends
+    count_array
+    data_array
+    window
+    batch_size
+
+    Returns
+    -------
+
+    """
+    idx_start, idx_end = _get_idxs(time_array, starts, ends)
+
+    # grab size
+    tot_size = np.sum(idx_end - idx_start)
+
+
+    tree_data = [data_array[start:end] for start, end in zip(idx_start, idx_end)]
+    tree_count = [count_array[start:end] for start, end in zip(idx_start, idx_end)]
+
+    def sta(cnt, dat):
+        results = sta_single_epoch(cnt, dat, window, batch_size=batch_size)
+        return results
+
+    frac_duration = (idx_end - idx_start) / jnp.sum(idx_end - idx_start)
+    res = sum(
+        [
+            sta_res / frac_duration[k] for k, sta_res in enumerate(jax.tree_map(sta, tree_count, tree_data))
+        ]
     )
 
     return res
