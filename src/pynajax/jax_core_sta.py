@@ -42,7 +42,7 @@ def fill_forward(time_series, data, ep=None, out_of_range=np.nan):
         data_ep = data.get(start, end)
         ts_ep = time_series.get(start, end)
         idxs = np.searchsorted(data_ep.t, ts_ep.t, side="right") - 1
-        filled_d[fill_idx:fill_idx + ts_ep.t.shape[0]][idxs >= 0] = data_ep.d[idxs[idxs>=0]]
+        filled_d[fill_idx:fill_idx + ts_ep.t.shape[0]][idxs >= 0] = data_ep.d[idxs[idxs >= 0]]
         fill_idx += ts_ep.t.shape[0]
     return type(data)(t=time_series.t, d=filled_d, time_support=ep)
 
