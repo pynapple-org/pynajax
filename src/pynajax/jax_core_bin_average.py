@@ -145,7 +145,7 @@ def jit_average(bins, data, edges):
 
     # Initialize arrays for sums and counts per bin, and perform bin-wise addition.
     n_bins = len(edges) - 1
-    sums = jnp.zeros((n_bins, *data_array.shape[1:])).at[bins].add(data)
+    sums = jnp.zeros((n_bins, *data.shape[1:])).at[bins].add(data)
     counts = jnp.zeros(n_bins).at[bins].add(1)
 
     average = (sums.T / counts).T
@@ -188,79 +188,76 @@ def bin_average(time_array, data_array, starts, ends, bin_size):
     return time_array_new[in_epoch], average[in_epoch]
 
 
-def get_list_splits(time_array, data_array, starts, ends):
-    idx_start = jnp.searchsorted(time_array, starts)
-    idx_end = jnp.searchsorted(time_array, ends)
-    edges = jnp.zeros(len(ends) * 2, dtype=jnp.int32).at[jnp.arange(0, len(ends) * 2, 2)].set(idx_start).at[
-        jnp.arange(1, len(ends) * 2, 2)].set(idx_end)
-    return jnp.array_split(data_array, edges, axis=0)[1::2]
+# def get_list_splits(time_array, data_array, starts, ends):
+#     idx_start = jnp.searchsorted(time_array, starts)
+#     idx_end = jnp.searchsorted(time_array, ends)
+#     edges = jnp.zeros(len(ends) * 2, dtype=jnp.int32).at[jnp.arange(0, len(ends) * 2, 2)].set(idx_start).at[
+#         jnp.arange(1, len(ends) * 2, 2)].set(idx_end)
+#     return jnp.array_split(data_array, edges, axis=0)[1::2]
 
 
-def set_val(arr, data, index):
-    return arr.at[:index[1]-index[0]].set(data[index[0]:index[1]])
+# def set_val(arr, data, index):
+#     return arr.at[:index[1]-index[0]].set(data[index[0]:index[1]])
 
 
-if __name__ == "__main__":
-    from time import perf_counter
-    from pynapple.core._jitted_functions import jitbin_array
+# if __name__ == "__main__":
+#     from time import perf_counter
+#     from pynapple.core._jitted_functions import jitbin_array
 
-    import pynapple as nap
+#     import pynapple as nap
 
-    T = 1001987
-    time_array = np.arange(T) / 2
-    data_array = np.arange(16 * T).reshape(T, 4, 2, 2)
-    starts = np.arange(1, T // 2 - 1, 20)
-    ends = np.arange(1, T // 2 - 1, 20) + 8
+#     T = 1001987
+#     time_array = np.arange(T) / 2
+#     data_array = np.arange(16 * T).reshape(T, 4, 2, 2)
+#     starts = np.arange(1, T // 2 - 1, 20)
+#     ends = np.arange(1, T // 2 - 1, 20) + 8
 
-    bin_size = 7.0
+#     bin_size = 7.0
 
-    ep = nap.IntervalSet(start=starts, end=ends)
-    tsd = nap.TsdTensor(t=time_array, d=data_array.copy())
+#     ep = nap.IntervalSet(start=starts, end=ends)
+#     tsd = nap.TsdTensor(t=time_array, d=data_array.copy())
 
-    data_array = jnp.asarray(data_array)
+#     data_array = jnp.asarray(data_array)
 
-    time_new, data_new = bin_average(time_array, data_array, starts, ends, bin_size)
-    res = tsd.bin_average(bin_size=bin_size, ep=ep)
+#     time_new, data_new = bin_average(time_array, data_array, starts, ends, bin_size)
+#     res = tsd.bin_average(bin_size=bin_size, ep=ep)
 
-    assert np.allclose(res.t, time_new)
-    assert np.allclose(res.d, data_new)
+#     assert np.allclose(res.t, time_new)
+#     assert np.allclose(res.d, data_new)
 
-    t0 = perf_counter()
-    bin_average(time_array, data_array, starts, ends, bin_size)
-    print("pynajax bin_average", perf_counter() - t0)
+#     t0 = perf_counter()
+#     bin_average(time_array, data_array, starts, ends, bin_size)
+#     print("pynajax bin_average", perf_counter() - t0)
 
-    t0 = perf_counter()
-    tsd.bin_average(bin_size=bin_size, ep=ep)
-    print("pynapple bin_average", perf_counter() - t0)
+#     t0 = perf_counter()
+#     tsd.bin_average(bin_size=bin_size, ep=ep)
+#     print("pynapple bin_average", perf_counter() - t0)
 
-    jitbin_array(time_array, tsd.d, starts, ends, bin_size)
-    t0 = perf_counter()
-    jitbin_array(time_array, tsd.d, starts, ends, bin_size)
-    print("pynapple jitbin_array", perf_counter() - t0)
+#     jitbin_array(time_array, tsd.d, starts, ends, bin_size)
+#     t0 = perf_counter()
+#     jitbin_array(time_array, tsd.d, starts, ends, bin_size)
+#     print("pynapple jitbin_array", perf_counter() - t0)
 
-    # timeit
-    # t0 = perf_counter()
-    # idx_start = jnp.searchsorted(time_array, starts)
-    # idx_end = jnp.searchsorted(time_array, ends)
-    # edges = jnp.zeros(len(ends) * 2, dtype=jnp.int32).at[jnp.arange(0, len(ends) * 2, 2)].set(idx_start).at[
-    #     jnp.arange(1, len(ends) * 2, 2)].set(idx_end)
+#     # timeit
+#     # t0 = perf_counter()
+#     # idx_start = jnp.searchsorted(time_array, starts)
+#     # idx_end = jnp.searchsorted(time_array, ends)
+#     # edges = jnp.zeros(len(ends) * 2, dtype=jnp.int32).at[jnp.arange(0, len(ends) * 2, 2)].set(idx_start).at[
+#     #     jnp.arange(1, len(ends) * 2, 2)].set(idx_end)
 
-    # aa = [data_array[s:e] for s, e in zip(idx_start, idx_end)]
-    # print("list comprehension", perf_counter()-t0)
+#     # aa = [data_array[s:e] for s, e in zip(idx_start, idx_end)]
+#     # print("list comprehension", perf_counter()-t0)
 
-    # t0 = perf_counter()
-    # bb = get_list_splits(time_array, data_array,starts, ends)
-    # print("jax array_split", perf_counter() - t0)
+#     # t0 = perf_counter()
+#     # bb = get_list_splits(time_array, data_array,starts, ends)
+#     # print("jax array_split", perf_counter() - t0)
 
-    # timeit
-    # t0 = perf_counter()
-    # mx = jnp.max(idx_end - idx_start)
-    # n_epoch = len(starts)
-    # idx_start = jnp.searchsorted(time_array, starts)
-    # idx_end = jnp.searchsorted(time_array, ends)
-    # indexes = jnp.zeros((n_epoch, 2), dtype=jnp.int32).at[:, 0].set(idx_start).at[:, 1].set(idx_end)
-    # array = jnp.zeros((mx, *data_array.shape[1:]))
-    # chunked_array = jax.vmap(lambda x: set_val(array, data_array, x), in_axes=0, out_axes=0)(indexes)
-
-
-
+#     # timeit
+#     # t0 = perf_counter()
+#     # mx = jnp.max(idx_end - idx_start)
+#     # n_epoch = len(starts)
+#     # idx_start = jnp.searchsorted(time_array, starts)
+#     # idx_end = jnp.searchsorted(time_array, ends)
+#     # indexes = jnp.zeros((n_epoch, 2), dtype=jnp.int32).at[:, 0].set(idx_start).at[:, 1].set(idx_end)
+#     # array = jnp.zeros((mx, *data_array.shape[1:]))
+#     # chunked_array = jax.vmap(lambda x: set_val(array, data_array, x), in_axes=0, out_axes=0)(indexes)
