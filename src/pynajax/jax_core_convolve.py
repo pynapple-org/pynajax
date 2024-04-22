@@ -4,7 +4,7 @@ from functools import partial
 
 import jax
 import jax.numpy as jnp
-import pynapple as nap
+from .utils import _get_idxs
 
 _convolve_vec = jax.vmap(partial(jnp.convolve, mode="same"), (1, None), 1)
 _convolve_mat = jax.vmap(_convolve_vec, (None, 1), -1)
@@ -73,7 +73,7 @@ def _jit_tree_convolve_2d_kernel(tree, kernel):
     """
     # Convolve each epoch
     func = partial(_reshape_convolve_2d_kernel, kernel=kernel)
-    convolved_epochs = jax.tree_map(lambda x: func(x), tree)
+    convolved_epochs = jax.tree.map(lambda x: func(x), tree)
     # Concatenate leaves on the first axis and return
     return jnp.concatenate(jax.tree.leaves(convolved_epochs), axis=0)
 
@@ -98,38 +98,9 @@ def _jit_tree_convolve_1d_kernel(tree, kernel):
     """
     # Convolve each epoch
     func = partial(_reshape_convolve_1d_kernel, kernel=kernel)
-    convolved_epochs = jax.tree_map(lambda x: func(x), tree)
+    convolved_epochs = jax.tree.map(lambda x: func(x), tree)
     # Concatenate leaves on the first axis and return
     return jnp.concatenate(jax.tree.leaves(convolved_epochs), axis=0)
-
-
-def construct_nap(time, data, time_support, columns):
-    """
-    Construct a pynapple timeseries object.
-
-    Parameters
-    ----------
-    time : numpy.ndarray
-        Array of time values.
-    data : numpy.ndarray
-        Array of data values.
-    time_support : pynapple.IntervalSet
-        Index representing the time support.
-    columns : list or None
-        List of column names.
-
-    Returns
-    -------
-    : pynapple.Tsd, pynapple.TsdFrame, pynapple.TsdTensor
-        The constructed pynapple timeseries object.
-    """
-    if data.ndim == 1:
-        data = nap.Tsd(t=time, d=data, time_support=time_support)
-    elif data.ndim == 2:
-        data = nap.TsdFrame(t=time, d=data, columns=columns, time_support=time_support)
-    else:
-        data = nap.TsdTensor(t=time, d=data, time_support=time_support)
-    return data
 
 
 @jax.jit
@@ -159,7 +130,7 @@ def convolve_epoch(data, kernel):
     return data
 
 
-def convolve_intervals(data, kernel):
+def convolve_intervals(time_array, data_array, starts, ends, kernel):
     """Convolve over the first dimension.
 
     Convolve over the first dimension, vectorizing on every dimension of data,
@@ -181,8 +152,10 @@ def convolve_intervals(data, kernel):
         is a 2-D array, another (last) dimension is added to store
         convolution with every column of kernels.
     """
-    # Create a tree of pynapple timeseries objects for each epoch
-    tree = [data.get(start, end).d for start, end in data.time_support.values]
+
+    idx_start, idx_end = _get_idxs(time_array, starts, ends)
+
+    tree = [data_array[start:end] for start, end in zip(idx_start, idx_end)]
 
     if kernel.ndim == 1:
         convolved_data = _jit_tree_convolve_1d_kernel(tree, kernel)
@@ -192,7 +165,7 @@ def convolve_intervals(data, kernel):
     return convolved_data
 
 
-def convolve(data, kernel):
+def convolve(time_array, data_array, starts, ends, kernel):
     """One-dimensional convolution."""
     # Perform convolution
     if kernel.ndim == 0:
@@ -201,9 +174,9 @@ def convolve(data, kernel):
             "0 dimensions"
         )
 
-    if len(data.time_support) == 1:
-        out = convolve_epoch(data.d, kernel)
+    if len(starts) == 1 and len(ends) == 1:
+        out = convolve_epoch(data_array, kernel)
     else:
-        out = convolve_intervals(data, kernel)
+        out = convolve_intervals(time_array, data_array, starts, ends, kernel)
 
     return out
