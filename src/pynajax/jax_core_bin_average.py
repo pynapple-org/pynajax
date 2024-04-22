@@ -4,7 +4,7 @@ import numpy as np
 import pynapple as nap
 from numba import jit
 
-_NAP_TIME_PRECISION = 10 ** (-nap.config.nap_config.time_index_precision)
+_NAP_TIME_PRECISION = 10 ** (-nap.nap_config.time_index_precision)
 
 
 @jit(nopython=True)
