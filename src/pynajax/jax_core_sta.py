@@ -3,6 +3,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from typing import Union
+from .utils import _get_idxs
 
 TsdType = Union[nap.Tsd, nap.TsdFrame, nap.TsdTensor]
 
@@ -203,4 +204,41 @@ def sta_single_epoch(count_array, data_array, window, batch_size=256):
         res = _dot_prod_feature_and_reshape(data_array, rolled_counts, window, shape)
     else:
         res = _batched_dot_prod_feature(data_array, rolled_counts, batch_size, window, shape)
+    return res
+
+
+def sta_multi_epoch(time_array, starts, ends, count_array, data_array, window, batch_size=256):
+    """
+    Compute a multi-epoch STA with a loop over epochs.
+
+    Parameters
+    ----------
+    time_array
+    starts
+    ends
+    count_array
+    data_array
+    window
+    batch_size
+
+    Returns
+    -------
+
+    """
+    idx_start, idx_end = _get_idxs(time_array, starts, ends)
+
+    tree_data = [data_array[start:end] for start, end in zip(idx_start, idx_end)]
+    tree_count = [count_array[start:end] for start, end in zip(idx_start, idx_end)]
+
+    def sta(cnt, dat):
+        results = sta_single_epoch(cnt, dat, window, batch_size=batch_size)
+        return results
+
+    res = sum(
+        jnp.divide(
+            jax.tree_map(sta, tree_count, tree_data),
+            (idx_end - idx_start) / jnp.sum(idx_end - idx_start)
+        )
+    )
+
     return res
