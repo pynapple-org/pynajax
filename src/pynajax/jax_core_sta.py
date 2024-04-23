@@ -146,11 +146,26 @@ def jitperievent_trigger_average(
     return new_data_array
 
 
-def pad_and_roll(count_array, window):
+def pad_and_roll(count_array, window, padding_type='backward'):
     n_samples = count_array.shape[0]
-    pad = lambda x: jnp.pad(x, pad_width=((0, window), (0, 0)), constant_values=[0, np.nan])
+
+    if padding_type == 'backward':
+        pad = lambda x: jnp.pad(x, pad_width=((0, window), (0, 0)), constant_values=np.nan)
+        indices = jnp.arange(window, -1, -1)
+        idx = jnp.arange(0, n_samples)
+    elif padding_type == 'forward':
+        pad = lambda x: jnp.pad(x, pad_width=((window, 0), (0, 0)), constant_values=np.nan)
+        indices = -jnp.arange(0, window + 1)
+        idx = jnp.arange(window, n_samples + window)
+    elif padding_type == 'both':
+        pad = lambda x: jnp.pad(x, pad_width=((window, window), (0, 0)), constant_values=np.nan)
+        indices = jnp.arange(-window, window + 1)[::-1]
+        idx = jnp.arange(window, n_samples + window)
+    else:
+        raise ValueError("Invalid padding_type. Use 'backward', 'forward', or 'both'.")
+
     roll = jax.vmap(lambda i: jnp.roll(pad(count_array), -i, axis=0))
-    return roll(jnp.arange(0, window + 1))[:, :n_samples]
+    return roll(indices)[:, idx]
 
 
 # dot prod shifted counts vs 1D var y vmapped over shift
