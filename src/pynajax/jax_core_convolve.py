@@ -4,6 +4,7 @@ from functools import partial
 
 import jax
 import jax.numpy as jnp
+
 from .utils import _get_idxs
 
 _convolve_vec = jax.vmap(partial(jnp.convolve, mode="same"), (1, None), 1)
