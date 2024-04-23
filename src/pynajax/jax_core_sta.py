@@ -1,9 +1,10 @@
+import numba
 import pynapple as nap
 import jax
 import jax.numpy as jnp
 import numpy as np
 from typing import Union
-from .utils import _get_idxs
+from .utils import _get_numpy_idxs
 
 TsdType = Union[nap.Tsd, nap.TsdFrame, nap.TsdTensor]
 
@@ -190,7 +191,7 @@ def _batched_dot_prod_feature(data_array, count_array, batch_size, window, shape
 
 def _dot_prod_feature_and_reshape(data_array, count_array, window, shape):
     res = dot_prod_feature(count_array, data_array)
-    res.reshape((window + 1, count_array.shape[2], *shape[1:]))
+    res = res.reshape((window + 1, count_array.shape[2], *shape[1:]))
     return res
 
 
@@ -225,7 +226,7 @@ def sta_multi_epoch(time_array, starts, ends, count_array, data_array, window, b
     -------
 
     """
-    idx_start, idx_end = _get_idxs(time_array, starts, ends)
+    idx_start, idx_end = _get_numpy_idxs(time_array, starts, ends)
 
     tree_data = [data_array[start:end] for start, end in zip(idx_start, idx_end)]
     tree_count = [count_array[start:end] for start, end in zip(idx_start, idx_end)]
@@ -234,14 +235,36 @@ def sta_multi_epoch(time_array, starts, ends, count_array, data_array, window, b
         results = sta_single_epoch(cnt, dat, window, batch_size=batch_size)
         return results
 
-    frac_duration = (idx_end - idx_start) / jnp.sum(idx_end - idx_start)
+    delta = idx_end - jnp.arange(window + 1)[:, jnp.newaxis] - idx_start
+
+    frac_duration = delta / jnp.sum(delta, axis=1)[:, np.newaxis]
+    frac_duration = frac_duration[:, :, np.newaxis, np.newaxis, np.newaxis]
     res = sum(
         [
-            sta_res / frac_duration[k] for k, sta_res in enumerate(jax.tree_map(sta, tree_count, tree_data))
+            sta_res * frac_duration[:, k] for k, sta_res in enumerate(jax.tree_map(sta, tree_count, tree_data))
         ]
     )
 
     return res
+
+
+def _get_shifted_indices(i_start, i_end, window):
+    cum_delta = np.concatenate([[0], np.cumsum(i_end - i_start)])
+    i_start_shift = window * np.arange(i_start.shape[0]) + cum_delta[:-1]
+    i_end_shift = window * np.arange(i_end.shape[0]) + cum_delta[1:]
+    return i_start_shift, i_end_shift
+
+
+@numba.njit
+def _get_slicing(i_start, i_end):
+    iend = np.sum(i_end - i_start)
+    ix = np.zeros(iend, dtype=np.int32)
+    cnt = 0
+    for st, en in zip(i_start, i_end):
+        for k in range(st, en):
+            ix[cnt] = k
+            cnt += 1
+    return ix
 
 
 def sta_multi_epoch_fast(time_array, starts, ends, count_array, data_array, window, batch_size=256):
@@ -262,24 +285,20 @@ def sta_multi_epoch_fast(time_array, starts, ends, count_array, data_array, wind
     -------
 
     """
-    idx_start, idx_end = _get_idxs(time_array, starts, ends)
+    count_array = jnp.asarray(count_array, dtype=float)
+    data_array = jnp.asarray(data_array, dtype=float)
 
-    # grab size
-    tot_size = np.sum(idx_end - idx_start)
+    idx_start, idx_end = _get_numpy_idxs(time_array, starts, ends)
+    # need numpy
+    idx_start_shift, idx_end_shift = _get_shifted_indices(idx_start, idx_end, window)
 
+    # get the indices for setting elements
+    ix_orig = _get_slicing(idx_start, idx_end)
+    ix_shift = _get_slicing(idx_start_shift, idx_end_shift)
 
-    tree_data = [data_array[start:end] for start, end in zip(idx_start, idx_end)]
-    tree_count = [count_array[start:end] for start, end in zip(idx_start, idx_end)]
+    # define larger array
+    tot_size = ix_shift[-1] - ix_shift[0] + 1
+    interleaved_data = jnp.full((tot_size, *data_array.shape[1:]), np.nan).at[ix_shift].set(data_array[ix_orig])
+    interleaved_counts = jnp.full((tot_size, *count_array.shape[1:]), np.nan).at[ix_shift].set(count_array[ix_orig])
 
-    def sta(cnt, dat):
-        results = sta_single_epoch(cnt, dat, window, batch_size=batch_size)
-        return results
-
-    frac_duration = (idx_end - idx_start) / jnp.sum(idx_end - idx_start)
-    res = sum(
-        [
-            sta_res / frac_duration[k] for k, sta_res in enumerate(jax.tree_map(sta, tree_count, tree_data))
-        ]
-    )
-
-    return res
+    return sta_single_epoch(interleaved_counts, interleaved_data, window, batch_size=batch_size)
