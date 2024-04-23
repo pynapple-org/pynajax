@@ -298,7 +298,50 @@ def sta_multi_epoch_fast(time_array, starts, ends, count_array, data_array, wind
 
     # define larger array
     tot_size = ix_shift[-1] - ix_shift[0] + 1
-    interleaved_data = jnp.full((tot_size, *data_array.shape[1:]), np.nan).at[ix_shift].set(data_array[ix_orig])
-    interleaved_counts = jnp.full((tot_size, *count_array.shape[1:]), np.nan).at[ix_shift].set(count_array[ix_orig])
 
-    return sta_single_epoch(interleaved_counts, interleaved_data, window, batch_size=batch_size)
+    data_array = jnp.full((tot_size, *data_array.shape[1:]), np.nan).at[ix_shift].set(data_array[ix_orig])
+    count_array = jnp.full((tot_size, *count_array.shape[1:]), np.nan).at[ix_shift].set(count_array[ix_orig])
+
+    return sta_single_epoch(count_array, data_array, window, batch_size=batch_size)
+
+
+def _batched_dot_prod_feature_multi(time_array, starts, ends, count_array, data_array, window, batch_size, shape):
+    num_full_batches = data_array.shape[1] // batch_size
+    carry = 0
+
+    idx_start, idx_end = _get_numpy_idxs(time_array, starts, ends)
+    # need numpy
+    idx_start_shift, idx_end_shift = _get_shifted_indices(idx_start, idx_end, window)
+
+    # get the indices for setting elements
+    ix_orig = _get_slicing(idx_start, idx_end)
+    ix_shift = _get_slicing(idx_start_shift, idx_end_shift)
+
+    # define larger array
+    tot_size = ix_shift[-1] - ix_shift[0] + 1
+    count_array = jnp.full((tot_size, *count_array.shape[1:]), np.nan).at[ix_shift].set(count_array[ix_orig])
+    count_array = pad_and_roll(count_array, window)
+
+    def scan_fn(carry, x):
+        slc = jax.lax.dynamic_slice(data_array, (0, carry), (data_array.shape[0], batch_size))
+        slc = jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
+        batch_result = dot_prod_feature(count_array, slc)
+        return carry + batch_size, batch_result
+
+    _, res = jax.lax.scan(scan_fn, carry, None, length=num_full_batches)
+
+    res = jnp.transpose(res, (1, 2, 0, 3))  # move features at the end
+    res = res.reshape(*res.shape[:-2],-1) # flatten features
+
+    extra_elements = data_array.shape[1] % batch_size
+    if extra_elements:
+        # compute residual slice
+        slc = data_array[:, -extra_elements:]
+        slc = jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
+
+        resid = dot_prod_feature(count_array, slc)
+        resid = resid.transpose(1, 2, 0).reshape(*res.shape[:-1], -1)
+        res = np.concatenate([res, resid], axis=2)
+
+    # reshape back to original and return
+    return res.reshape((window + 1, count_array.shape[2], *shape[1:]))
