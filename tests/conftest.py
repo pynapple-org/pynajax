@@ -1,3 +1,3 @@
-import pynapple as nap
+# import pynapple as nap
 
-nap.nap_config.set_backend("jax")
+# nap.nap_config.set_backend("jax")
