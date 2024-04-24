@@ -168,7 +168,7 @@ def convolve(time_array, data_array, starts, ends, kernel):
     # Perform convolution
     if kernel.ndim == 0:
         raise IOError(
-            "Provide a kernel with at least 1 dimension, current kernel has " "0 dimensions"
+            "Provide a kernel with at least 1 dimension, current kernel has 0 dimensions"
         )
 
     if len(starts) == 1 and len(ends) == 1:
