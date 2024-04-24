@@ -1,5 +1,7 @@
 import nox
 
+#nox --no-venv -s linters
+#nox --no-venv -s tests
 
 @nox.session(name="tests")
 def tests(session):
