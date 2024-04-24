@@ -142,7 +142,6 @@ def _get_bin_edges(time_array, starts, ends, bin_size):
 
 @jax.jit
 def jit_average(bins, data, edges):
-
     # Initialize arrays for sums and counts per bin, and perform bin-wise addition.
     n_bins = len(edges) - 1
     sums = jnp.zeros((n_bins, *data.shape[1:])).at[bins].add(data)

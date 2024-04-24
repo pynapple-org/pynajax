@@ -49,9 +49,7 @@ def _reshape_convolve_1d_kernel(tensor, kernel):
     jax.numpy.ndarray:
         The convolved tensor.
     """
-    return _convolve_vec(tensor.reshape(tensor.shape[0], -1), kernel).reshape(
-        tensor.shape
-    )
+    return _convolve_vec(tensor.reshape(tensor.shape[0], -1), kernel).reshape(tensor.shape)
 
 
 @jax.jit
@@ -153,7 +151,6 @@ def convolve_intervals(time_array, data_array, starts, ends, kernel):
         is a 2-D array, another (last) dimension is added to store
         convolution with every column of kernels.
     """
-
     idx_start, idx_end = _get_idxs(time_array, starts, ends)
 
     tree = [data_array[start:end] for start, end in zip(idx_start, idx_end)]
@@ -171,8 +168,7 @@ def convolve(time_array, data_array, starts, ends, kernel):
     # Perform convolution
     if kernel.ndim == 0:
         raise IOError(
-            "Provide a kernel with at least 1 dimension, current kernel has "
-            "0 dimensions"
+            "Provide a kernel with at least 1 dimension, current kernel has " "0 dimensions"
         )
 
     if len(starts) == 1 and len(ends) == 1:

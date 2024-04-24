@@ -11,4 +11,3 @@ def tests(session):
 def linters(session):
     """Run linters"""
     session.run("ruff", "check", "src", "--ignore", "D")
-

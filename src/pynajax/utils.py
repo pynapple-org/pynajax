@@ -1,5 +1,4 @@
 import numpy as np
-import jax.numpy as jnp
 from numba import jit
 
 
@@ -41,12 +40,20 @@ def _get_idxs(time_array, starts, ends):
     idx_end = np.searchsorted(time_array, ends, side="right")
     return idx_start, idx_end
 
-def _fill_forward(time_target_array, time_array, data_array, starts, ends, out_of_range=np.nan):
+
+def _fill_forward(
+    time_target_array,
+    time_array,
+    data_array,
+    starts,
+    ends,
+    out_of_range=np.nan,
+):
     """
     Fill a time series forward in time with data. Useful for event trigger average
     if the data have a lower sampling rate. This function assumes that the data have
     been restricted beforehand.
-    
+
     Parameters
     ----------
     time_target_array : ArrayLike
@@ -56,30 +63,32 @@ def _fill_forward(time_target_array, time_array, data_array, starts, ends, out_o
     data_array : ArrayLike
         The data to extent
     starts : ArrayLike
-        
+
     ends : ArrayLike
-        
+
     out_of_range : Number, optional
         How to fill the gap
-    
+
     Returns
     -------
     : ArrayLike
         The data time series filled forward.
-        
+
     """
     filled_d = np.full(
-        (time_target_array.shape[0], *data_array.shape[1:]), out_of_range, dtype=data_array.dtype
-        )
+        (time_target_array.shape[0], *data_array.shape[1:]),
+        out_of_range,
+        dtype=data_array.dtype,
+    )
     fill_idx = 0
 
     idx_start_target, idx_end_target = _get_idxs(time_target_array, starts, ends)
     idx_start, idx_end = _get_idxs(time_array, starts, ends)
 
     for i in range(len(idx_start)):
-        d = data_array[idx_start[i]:idx_end[i]]
-        t = time_array[idx_start[i]:idx_end[i]]
-        ts = time_target_array[idx_start_target[i]:idx_end_target[i]]
+        d = data_array[idx_start[i] : idx_end[i]]
+        t = time_array[idx_start[i] : idx_end[i]]
+        ts = time_target_array[idx_start_target[i] : idx_end_target[i]]
 
         idxs = np.searchsorted(t, ts, side="right") - 1
         filled_d[fill_idx : fill_idx + len(ts)][idxs >= 0] = d[idxs[idxs >= 0]]
@@ -87,6 +96,7 @@ def _fill_forward(time_target_array, time_array, data_array, starts, ends, out_o
         fill_idx += len(ts)
 
     return filled_d
+
 
 def _get_shifted_indices(idx_start, idx_end, window):
     """
@@ -99,7 +109,7 @@ def _get_shifted_indices(idx_start, idx_end, window):
     idx_end : ArrayLike
         Array of end indices.
     windows : ArrayLike
-        
+
 
     Returns
     -------
@@ -110,6 +120,7 @@ def _get_shifted_indices(idx_start, idx_end, window):
     idx_start_shift = window * np.arange(idx_start.shape[0]) + cum_delta[:-1]
     idx_end_shift = window * np.arange(idx_end.shape[0]) + cum_delta[1:]
     return idx_start_shift, idx_end_shift
+
 
 @jit(nopython=True)
 def _get_slicing(idx_start, idx_end):

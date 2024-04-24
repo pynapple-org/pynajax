@@ -9,7 +9,7 @@ import pynajax as jnap
 import pynajax.jax_core_convolve
 from contextlib import nullcontext as does_not_raise
 
-nap.config.nap_config.set_backend("jax")
+nap.nap_config.set_backend("jax")
 
 @pytest.mark.parametrize(
     "shape_array1, shape_array2", [((3,), (10, 2)), ((3,), (10, 2, 3))]

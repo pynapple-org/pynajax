@@ -1,11 +1,10 @@
-from typing import Union
-
 import jax
 import jax.numpy as jnp
 import numpy as np
+
 from pynajax.jax_core_bin_average import bin_average
 
-from .utils import _get_idxs, _fill_forward, _get_shifted_indices, _get_slicing
+from .utils import _fill_forward, _get_idxs, _get_shifted_indices, _get_slicing
 
 # dot prod shifted counts vs 1D var y vmapped over shift
 # [(n_shift, T), (T, )] -> (n_shift, )
@@ -46,16 +45,24 @@ def pad_and_roll(count_array, windows):
     statistical or computational errors.
     """
     n_samples = count_array.shape[0]
-    pad = lambda x: jnp.pad(
-        x, pad_width=(windows, (0, 0)), constant_values=np.nan
-    )
+    pad = lambda x: jnp.pad(x, pad_width=(windows, (0, 0)), constant_values=np.nan)
     indices = jnp.arange(-windows[0], windows[1] + 1)[::-1]
     idx = jnp.arange(windows[0], n_samples + windows[1] + 2)
     roll = jax.vmap(lambda i: jnp.roll(pad(count_array), -i, axis=0))
     return roll(indices)[:, idx]
 
 
-def event_trigger_average(time_target_array,count_array,time_array,data_array,starts,ends,windows,binsize,batch_size):
+def event_trigger_average(
+    time_target_array,
+    count_array,
+    time_array,
+    data_array,
+    starts,
+    ends,
+    windows,
+    binsize,
+    batch_size,
+):
     """
     Main function to call for event-triggered averages (ETA) across multiple epochs.
     This function assumes count array and data array have been restricted before.
@@ -87,17 +94,16 @@ def event_trigger_average(time_target_array,count_array,time_array,data_array,st
         The combined STA calculated across all specified epochs.
 
     """
-
     # Need to bring data_target_array to same shape as count_array
     # bin_average
-    if count_array.shape[0] < data_array.shape[0] : 
+    if count_array.shape[0] < data_array.shape[0]:
         data_array = bin_average(time_array, data_array, starts, ends, binsize)
     # fill_forward
-    else: 
+    else:
         data_array = _fill_forward(time_target_array, time_array, data_array, starts, ends)
 
     idx_start, idx_end = _get_idxs(time_target_array, starts, ends)
-    idx_start_shift, idx_end_shift = _get_shifted_indices(idx_start, idx_end, np.sum(windows)+1)
+    idx_start_shift, idx_end_shift = _get_shifted_indices(idx_start, idx_end, np.sum(windows) + 1)
 
     # get the indices for setting elements
     ix_orig = _get_slicing(idx_start, idx_end)
@@ -111,25 +117,19 @@ def event_trigger_average(time_target_array,count_array,time_array,data_array,st
         data_array = np.expand_dims(data_array, -1)
     else:
         data_array = data_array.reshape(shape[0], -1)
-    
+
     num_full_batches = np.maximum(1, data_array.shape[1] // batch_size)
     batch_size = np.minimum(data_array.shape[1], batch_size)
     carry = 0
 
     count_array = (
-        jnp.full((tot_size, *count_array.shape[1:]), np.nan)
-        .at[ix_shift]
-        .set(count_array[ix_orig])
+        jnp.full((tot_size, *count_array.shape[1:]), np.nan).at[ix_shift].set(count_array[ix_orig])
     )
     count_array = pad_and_roll(count_array, windows)
 
     def scan_fn(carry, x):
-        slc = jax.lax.dynamic_slice(
-            data_array, (0, carry), (data_array.shape[0], batch_size)
-        )
-        slc = (
-            jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
-        )
+        slc = jax.lax.dynamic_slice(data_array, (0, carry), (data_array.shape[0], batch_size))
+        slc = jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
         batch_result = _dot_prod_feature(count_array, slc)
         return carry + batch_size, batch_result
 
@@ -142,16 +142,13 @@ def event_trigger_average(time_target_array,count_array,time_array,data_array,st
     if extra_elements:
         # compute residual slice
         slc = data_array[:, -extra_elements:]
-        slc = (
-            jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
-        )
+        slc = jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
 
         resid = _dot_prod_feature(count_array, slc)
         resid = resid.transpose(1, 2, 0).reshape(*res.shape[:-1], -1)
         res = np.concatenate([res, resid], axis=2)
 
     # reshape back to original and return
-    res = res.reshape((np.sum(windows)+1, count_array.shape[-1], *shape[1:]))
-    
+    res = res.reshape((np.sum(windows) + 1, count_array.shape[-1], *shape[1:]))
+
     return res
-    
