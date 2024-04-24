@@ -20,11 +20,12 @@ classifiers = [
 ]
 
 # Define dependencies for the project
-dependencies = [
+dependencies = [    
     'jax>=0.4',                     # Numerical computing library
     'typing_extensions>=4.6',       # Typing extensions for Python
-    'pynapple',
-    'jaxlib'
+    'numpy',
+    'jaxlib',
+    'pynapple@git+https://github.com/pynapple-org/pynapple#egg=dev'
 ]
 
 
