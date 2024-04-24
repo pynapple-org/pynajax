@@ -24,7 +24,7 @@ def test_2d_convolve_epoch_vec(shape_array1, shape_array2):
         res_numpy[full_indices] = np.convolve(arr1, arr2[full_indices], mode="same")
 
     res_pynajax = jax_core_convolve.convolve_epoch(jnp.asarray(arr2), arr1)
-    assert np.allclose(res_pynajax, res_numpy)
+    np.testing.assert_array_almost_equal(res_pynajax, res_numpy)
 
 
 @pytest.mark.parametrize(
@@ -45,7 +45,7 @@ def test_2d_convolve_epoch_mat(shape_array1, shape_array2):
             )
 
     res_pynajax = jax_core_convolve.convolve_epoch(arr2, arr1)
-    assert np.allclose(res_pynajax, res_numpy)
+    np.testing.assert_array_almost_equal(res_pynajax, res_numpy)
     assert isinstance(res_pynajax, jnp.ndarray)
 
 
