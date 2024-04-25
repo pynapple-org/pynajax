@@ -40,8 +40,7 @@ def tests2(session):
         shutil.copy(nap_test_path.joinpath(f), path.joinpath(f))
 
     # Copying nwbfiletest and npzfiletest
-    copy_and_overwrite(nap_test_path.joinpath("nwbfilestest"), path.joinpath("nwbfilestest"))
-    copy_and_overwrite(nap_test_path.joinpath("npzfilestest"), path.joinpath("npzfilestest"))
+    copy_and_overwrite(nap_test_path.joinpath("nwbfilestest"), path.joinpath("nwbfilestest"))    
 
     try:
         session.run("pytest")        
@@ -53,8 +52,7 @@ def tests2(session):
             except OSError:
                 pass
         # Remove folders
-        shutil.rmtree(path.joinpath("nwbfilestest"))
-        shutil.rmtree(path.joinpath("npzfilestest"))
+        shutil.rmtree(path.joinpath("nwbfilestest"))        
             
 
     
