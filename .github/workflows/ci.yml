@@ -34,11 +34,8 @@ jobs:
 
       - name: Clone and install pynapple
         run: |
-          cd ../
-          git clone -b dev https://github.com/pynapple-org/pynapple.git
-          cd pynapple/
-          pip install -e .
-          cd ../pynajax/
+          git clone ../ -b dev https://github.com/pynapple-org/pynapple.git          
+          pip install -e ../pynapple          
 
       - name: Run nox
         run: |
