@@ -30,11 +30,11 @@ def linters(session):
 def tests2(session):
     """Run the test suite."""
     
-    nap_test_path = Path.home().joinpath("pynapple/tests")
-    path = Path.home().joinpath("pynajax/tests")
+    nap_test_path = Path("../pynapple/tests")
+    path = Path("tests/")
     
     # Copying test files
-    tocopy = os.listdir("../pynapple/tests/")
+    tocopy = os.listdir(nap_test_path)
     tocopy = list(filter(lambda x: x[0:5] == "test_" and x not in to_exclude, tocopy))
     for f in tocopy:
         shutil.copy(nap_test_path.joinpath(f), path.joinpath(f))
