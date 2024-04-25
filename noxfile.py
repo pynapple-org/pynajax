@@ -21,10 +21,10 @@ to_exclude = [
 #nox --no-venv -s linters
 #nox --no-venv -s tests
 
-# @nox.session(name="linters")
-# def linters(session):
-#     """Run linters"""
-#     session.run("ruff", "check", "src", "--ignore", "D")
+@nox.session(name="linters")
+def linters(session):
+    """Run linters"""
+    session.run("ruff", "check", "src", "--ignore", "D")
 
 @nox.session(name="tests")
 def tests2(session):
