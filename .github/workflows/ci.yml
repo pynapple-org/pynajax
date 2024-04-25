@@ -34,13 +34,16 @@ jobs:
 
       - name: Clone and install pynapple
         run: |
-          git clone -b dev https://github.com/pynapple-org/pynapple.git ../          
-          pip install -e ../pynapple
+          cd ../
+          git clone -b dev https://github.com/pynapple-org/pynapple.git
+          cd pynapple/
+          pip install -e .
+          cd ../pynajax/
 
       - name: Run nox
         run: |
           nox
-          
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
