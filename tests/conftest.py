@@ -9,7 +9,10 @@ def pytest_sessionstart(session):
     file after command line options have been parsed.
     """    
     import pynapple as nap
-    return nap.nap_config.set_backend("jax")
+    from jax import config
+    config.update("jax_enable_x64", True)
+    nap.nap_config.set_backend("jax")
+    return
 
 
 

@@ -8,7 +8,7 @@ from .utils import _fill_forward, _get_idxs, _get_shifted_indices, _get_slicing
 
 # dot prod shifted counts vs 1D var y vmapped over shift
 # [(n_shift, T), (T, )] -> (n_shift, )
-_dot_prod = jax.vmap(lambda x, y: jnp.nanmean(x * y), in_axes=(0, None), out_axes=0)
+_dot_prod = jax.vmap(lambda x, y: jnp.nansum(x * y), in_axes=(0, None), out_axes=0)
 # vmap over the neurons
 # [(n_shift, T, n_neurons), (T, )] -> (n_shift, n_neurons)
 _dot_prod_neu = jax.vmap(_dot_prod, in_axes=(2, None), out_axes=1)
@@ -47,7 +47,8 @@ def pad_and_roll(count_array, windows):
     n_samples = count_array.shape[0]
     pad = lambda x: jnp.pad(x, pad_width=(windows, (0, 0)), constant_values=np.nan)
     indices = jnp.arange(-windows[0], windows[1] + 1)[::-1]
-    idx = jnp.arange(windows[0], n_samples + windows[1] + 2)
+    # idx = jnp.arange(windows[0], n_samples + windows[1] + 2)
+    idx = jnp.arange(windows[0], n_samples + windows[1])
     roll = jax.vmap(lambda i: jnp.roll(pad(count_array), -i, axis=0))
     return roll(indices)[:, idx]
 
@@ -97,7 +98,7 @@ def event_trigger_average(
     # Need to bring data_target_array to same shape as count_array
     # bin_average
     if count_array.shape[0] < data_array.shape[0]:
-        data_array = bin_average(time_array, data_array, starts, ends, binsize)
+        time_array, data_array = bin_average(time_array, data_array, starts, ends, binsize)
     # fill_forward
     else:
         data_array = _fill_forward(time_target_array, time_array, data_array, starts, ends)
@@ -121,6 +122,8 @@ def event_trigger_average(
     num_full_batches = np.maximum(1, data_array.shape[1] // batch_size)
     batch_size = np.minimum(data_array.shape[1], batch_size)
     carry = 0
+
+    tot_count = jnp.sum(count_array, 0)
 
     count_array = (
         jnp.full((tot_size, *count_array.shape[1:]), np.nan).at[ix_shift].set(count_array[ix_orig])
@@ -148,7 +151,12 @@ def event_trigger_average(
         resid = resid.transpose(1, 2, 0).reshape(*res.shape[:-1], -1)
         res = np.concatenate([res, resid], axis=2)
 
-    # reshape back to original and return
+    # import ipdb
+    # ipdb.set_trace()
+
+    # reshape back to original
     res = res.reshape((np.sum(windows) + 1, count_array.shape[-1], *shape[1:]))
+
+    res = np.apply_along_axis(jnp.divide, 1, res, tot_count)
 
     return res

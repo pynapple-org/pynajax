@@ -18,10 +18,12 @@ def test_2d_convolve_epoch_vec(shape_array1, shape_array2):
     arr1 = np.random.normal(size=shape_array1)
     arr2 = np.random.normal(size=shape_array2)
 
-    res_numpy = np.zeros(arr2.shape)
-    for indices in itertools.product(*[range(dim) for dim in arr2.shape[1:]]):
-        full_indices = (slice(None),) + indices
-        res_numpy[full_indices] = np.convolve(arr1, arr2[full_indices], mode="same")
+    # res_numpy = []
+    # for i in range(arr2.shape[1]):
+    #     res_numpy.append(np.convolve(arr2[:,i], arr1, mode="full"))
+    # res_numpy = np.array(res_numpy).T
+
+    res_numpy = np.apply_along_axis(np.convolve, 0, arr2, arr1)
 
     res_pynajax = jax_core_convolve.convolve_epoch(jnp.asarray(arr2), arr1)
     np.testing.assert_array_almost_equal(res_pynajax, res_numpy)
@@ -36,13 +38,11 @@ def test_2d_convolve_epoch_mat(shape_array1, shape_array2):
     arr1 = np.random.normal(size=shape_array1)
     arr2 = np.random.normal(size=shape_array2)
 
-    res_numpy = np.zeros((*arr2.shape, arr1.shape[1]))
-    for j in range(arr1.shape[1]):
-        for indices in itertools.product(*[range(dim) for dim in arr2.shape[1:]]):
-            full_indices = (slice(None),) + indices
-            res_numpy[(*full_indices, j)] = np.convolve(
-                arr1[:, j], arr2[full_indices], mode="same"
-            )
+    res_numpy = []
+    for i in range(arr1.shape[1]):
+        res_numpy.append(np.apply_along_axis(np.convolve, 0, arr2, arr1[:,i]))
+    res_numpy = np.array(res_numpy)
+    res_numpy = np.rollaxis(res_numpy, 0, res_numpy.ndim)
 
     res_pynajax = jax_core_convolve.convolve_epoch(arr2, arr1)
     np.testing.assert_array_almost_equal(res_pynajax, res_numpy)

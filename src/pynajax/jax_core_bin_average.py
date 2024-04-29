@@ -5,8 +5,6 @@ import numpy as np
 # import pynapple as nap
 from numba import jit
 
-# _NAP_TIME_PRECISION = 10 ** (-nap.nap_config.time_index_precision)
-
 
 @jit(nopython=True)
 def _get_mask_and_count(time_array, starts, ends):
@@ -66,7 +64,7 @@ def _get_mask_and_count(time_array, starts, ends):
 
 
 @jit(nopython=True)
-def _get_bin_edges(time_array, starts, ends, bin_size):
+def _get_bin_edges(time_array, starts, ends, binsize):
     """
     Compute bin edges for averaging within specified epochs and identify
     within-epoch time points.
@@ -79,7 +77,7 @@ def _get_bin_edges(time_array, starts, ends, bin_size):
         Start times of the epochs.
     ends : numpy.ndarray
         End times of the epochs.
-    bin_size : float
+    binsize : float
         Size of each bin.
 
     Returns
@@ -98,8 +96,8 @@ def _get_bin_edges(time_array, starts, ends, bin_size):
     m = starts.shape[0]
     nb_bins = np.zeros(m, dtype=np.int32)
     for k in range(m):
-        if (ends[k] - starts[k]) > bin_size:
-            nb_bins[k] = int(np.ceil((ends[k] + bin_size - starts[k]) / bin_size))
+        if (ends[k] - starts[k]) > binsize:
+            nb_bins[k] = int(np.ceil((ends[k] + binsize - starts[k]) / binsize))
         else:
             nb_bins[k] = 1
 
@@ -121,16 +119,16 @@ def _get_bin_edges(time_array, starts, ends, bin_size):
         # add all left edges
         while b < maxb:
             xpos = lbound
-            if xpos + bin_size / 2 > ends[k]:
+            if xpos + binsize / 2 > ends[k]:
                 break
             else:
-                edges[edge_idx] = xpos
-                lbound += bin_size
+                edges[edge_idx] = np.around(xpos, 9)
+                lbound += binsize
                 b += 1
                 edge_idx += 1
 
         # add final edge of epoch
-        edges[edge_idx] = edges[edge_idx - 1] + bin_size
+        edges[edge_idx] = edges[edge_idx - 1] + np.around(binsize, 9)
         in_epoch[edge_idx] = False
 
         edge_idx += 1
@@ -152,7 +150,7 @@ def jit_average(bins, data, edges):
     return average
 
 
-def bin_average(time_array, data_array, starts, ends, bin_size):
+def bin_average(time_array, data_array, starts, ends, binsize):
     """
     Perform bin-averaging of data array based on time array within specified epochs.
 
@@ -166,7 +164,7 @@ def bin_average(time_array, data_array, starts, ends, bin_size):
         Start times of the epochs.
     ends : numpy.ndarray
         End times of the epochs.
-    bin_size : float
+    binsize : float
         Size of each bin.
 
     Returns
@@ -177,14 +175,14 @@ def bin_average(time_array, data_array, starts, ends, bin_size):
         New data array containing the averaged values.
     """
     # Calculate bin edges and identify time points within epochs for averaging.
-    ix, edges, in_epoch = _get_bin_edges(time_array, starts, ends, bin_size=bin_size)
+    ix, edges, in_epoch = _get_bin_edges(time_array, starts, ends, binsize=binsize)
 
     # Digitize time points to find corresponding bins, adjusting indices to be 0-based.
     bins = np.digitize(time_array[ix], edges) - 1
     average = jit_average(bins, data_array[ix], edges)
 
     # Create a new time array with bin centers, and filter by in-epoch bins.
-    time_array_new = edges[:-1] + bin_size / 2
+    time_array_new = edges[:-1] + binsize / 2
     return time_array_new[in_epoch], average[in_epoch]
 
 
@@ -212,30 +210,30 @@ def bin_average(time_array, data_array, starts, ends, bin_size):
 #     starts = np.arange(1, T // 2 - 1, 20)
 #     ends = np.arange(1, T // 2 - 1, 20) + 8
 
-#     bin_size = 7.0
+#     binsize = 7.0
 
 #     ep = nap.IntervalSet(start=starts, end=ends)
 #     tsd = nap.TsdTensor(t=time_array, d=data_array.copy())
 
 #     data_array = jnp.asarray(data_array)
 
-#     time_new, data_new = bin_average(time_array, data_array, starts, ends, bin_size)
-#     res = tsd.bin_average(bin_size=bin_size, ep=ep)
+#     time_new, data_new = bin_average(time_array, data_array, starts, ends, binsize)
+#     res = tsd.bin_average(binsize=binsize, ep=ep)
 
 #     assert np.allclose(res.t, time_new)
 #     assert np.allclose(res.d, data_new)
 
 #     t0 = perf_counter()
-#     bin_average(time_array, data_array, starts, ends, bin_size)
+#     bin_average(time_array, data_array, starts, ends, binsize)
 #     print("pynajax bin_average", perf_counter() - t0)
 
 #     t0 = perf_counter()
-#     tsd.bin_average(bin_size=bin_size, ep=ep)
+#     tsd.bin_average(binsize=binsize, ep=ep)
 #     print("pynapple bin_average", perf_counter() - t0)
 
-#     jitbin_array(time_array, tsd.d, starts, ends, bin_size)
+#     jitbin_array(time_array, tsd.d, starts, ends, binsize)
 #     t0 = perf_counter()
-#     jitbin_array(time_array, tsd.d, starts, ends, bin_size)
+#     jitbin_array(time_array, tsd.d, starts, ends, binsize)
 #     print("pynapple jitbin_array", perf_counter() - t0)
 
 #     # timeit

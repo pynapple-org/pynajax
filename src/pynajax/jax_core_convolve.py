@@ -4,10 +4,11 @@ from functools import partial
 
 import jax
 import jax.numpy as jnp
+import numpy as np
 
-from .utils import _get_idxs
+from .utils import _get_idxs, _get_slicing
 
-_convolve_vec = jax.vmap(partial(jnp.convolve, mode="same"), (1, None), 1)
+_convolve_vec = jax.vmap(partial(jnp.convolve, mode="full"), (1, None), 1)
 _convolve_mat = jax.vmap(_convolve_vec, (None, 1), -1)
 
 
@@ -28,8 +29,8 @@ def _reshape_convolve_2d_kernel(tensor, kernel):
     jax.numpy.ndarray:
         The convolved tensor.
     """
-    shape_new = (*tensor.shape, kernel.shape[1])
-    return _convolve_mat(tensor.reshape(tensor.shape[0], -1), kernel).reshape(shape_new)
+    out = _convolve_mat(tensor.reshape(tensor.shape[0], -1), kernel)
+    return out.reshape((tensor.shape[0]+kernel.shape[0]-1,)+tensor.shape[1:]+(kernel.shape[1],))
 
 
 @jax.jit
@@ -49,7 +50,8 @@ def _reshape_convolve_1d_kernel(tensor, kernel):
     jax.numpy.ndarray:
         The convolved tensor.
     """
-    return _convolve_vec(tensor.reshape(tensor.shape[0], -1), kernel).reshape(tensor.shape)
+    out = _convolve_vec(tensor.reshape(tensor.shape[0], -1), kernel)
+    return out.reshape((tensor.shape[0]+kernel.shape[0]-1,)+tensor.shape[1:])
 
 
 @jax.jit
@@ -129,7 +131,17 @@ def convolve_epoch(data, kernel):
     return data
 
 
-def convolve_intervals(time_array, data_array, starts, ends, kernel):
+def _get_trim_idx(t, k, trim="both"):
+    if trim == "both":
+        cut = ((k - 1) // 2, t + k - 1 - ((k - 1) // 2) - (1 - k % 2))
+    elif trim == "left":
+        cut = (k - 1, t + k - 1)
+    elif trim == "right":
+        cut = (0, t)
+    return cut
+
+
+def convolve_intervals(time_array, data_array, starts, ends, kernel, trim="both"):
     """Convolve over the first dimension.
 
     Convolve over the first dimension, vectorizing on every dimension of data,
@@ -152,6 +164,14 @@ def convolve_intervals(time_array, data_array, starts, ends, kernel):
         convolution with every column of kernels.
     """
     idx_start, idx_end = _get_idxs(time_array, starts, ends)
+    extra = _get_trim_idx(0, kernel.shape[0], trim)
+    extra = (extra[0], extra[1] + 1)
+
+    n = len(starts)
+    idx_start_shift = idx_start + np.arange(1, n+1)*extra[0] + np.arange(0, n)*extra[1]
+    idx_end_shift = idx_end + np.arange(1, n+1)*extra[0] + np.arange(0, n)*extra[1]
+
+    idx = _get_slicing(idx_start_shift, idx_end_shift)
 
     tree = [data_array[start:end] for start, end in zip(idx_start, idx_end)]
 
@@ -160,10 +180,13 @@ def convolve_intervals(time_array, data_array, starts, ends, kernel):
     else:
         convolved_data = _jit_tree_convolve_2d_kernel(tree, kernel)
 
-    return convolved_data
+    return convolved_data[idx]
 
 
-def convolve(time_array, data_array, starts, ends, kernel):
+
+
+
+def convolve(time_array, data_array, starts, ends, kernel, trim="both"):
     """One-dimensional convolution."""
     # Perform convolution
     if kernel.ndim == 0:
@@ -172,8 +195,9 @@ def convolve(time_array, data_array, starts, ends, kernel):
         )
 
     if len(starts) == 1 and len(ends) == 1:
-        out = convolve_epoch(data_array, kernel)
+        cut = _get_trim_idx(data_array.shape[0], kernel.shape[0], trim)
+        out = convolve_epoch(data_array, kernel)[cut[0]:cut[1]]
     else:
-        out = convolve_intervals(time_array, data_array, starts, ends, kernel)
+        out = convolve_intervals(time_array, data_array, starts, ends, kernel, trim)
 
     return out
