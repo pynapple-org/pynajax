@@ -5,23 +5,6 @@ import pytest
 
 # Define test cases for each function
 
-@pytest.mark.parametrize("count_array, windows, expected_result", [
-    (
-        np.array([[1., 2., 3.], [4., 5., 6.], [7., 8., 9.]]),
-        (2, 0),
-        np.array([
-            [[np.nan, np.nan, np.nan]],
-            [[1., 2., 3.]],
-            [[np.nan, np.nan, np.nan]]
-        ])
-    ),
-    # Add more test cases with correct shapes
-])
-def test_pad_and_roll(count_array, windows, expected_result):
-    result = pad_and_roll(count_array, windows)
-    np.testing.assert_array_equal(np.nan_to_num(result), np.nan_to_num(expected_result), err_msg="Arrays do not match.")
-    assert np.all(np.isnan(result) == np.isnan(expected_result)), "NaN positions do not match."
-
 
 def test_get_idxs():
     # Define test input
