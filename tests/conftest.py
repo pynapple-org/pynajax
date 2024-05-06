@@ -1,6 +1,7 @@
 import pytest
+import pynapple as nap
 
-
+nap.nap_config.set_backend("jax")
 
 def pytest_sessionstart(session):
     """
