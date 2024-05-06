@@ -11,7 +11,10 @@ def copy_and_overwrite(from_path, to_path):
     shutil.copytree(from_path, to_path)
 
 to_exclude = [
+    "test_jitted.py",
     "test_numpy_compatibility.py", # Pynajax has its own
+    "test_config.py",
+    "conftest.py"
     ]
 
 #nox --no-venv -s linters
@@ -39,7 +42,7 @@ def tests(session):
     copy_and_overwrite(nap_test_path.joinpath("nwbfilestest"), path.joinpath("nwbfilestest"))
 
     try:
-        session.run("pytest")#, "--pdb", "--pdbcls=IPython.terminal.debugger:Pdb")
+        session.run("pytest")#, "--pdb", "--pdbcls=IPython.terminal.debugger:Pdb")        
     finally:
         # Remove files
         for f in tocopy:
