@@ -1,5 +1,137 @@
+import warnings
+from numbers import Number
+
+import jax.numpy as jnp
 import numpy as np
 from numba import jit
+
+
+def is_array_like(obj):
+    """
+    Check if an object is array-like.
+
+    This function determines if an object has array-like properties.
+    An object is considered array-like if it has attributes typically associated with arrays
+    (such as `.shape`, `.dtype`, and `.ndim`), supports indexing, and is iterable.
+
+    Parameters
+    ----------
+    obj : object
+        The object to check for array-like properties.
+
+    Returns
+    -------
+    bool
+        True if the object is array-like, False otherwise.
+
+    Notes
+    -----
+    This function uses a combination of checks for attributes (`shape`, `dtype`, `ndim`),
+    indexability, and iterability to determine if the given object behaves like an array.
+    It is designed to be flexible and work with various types of array-like objects, including
+    but not limited to NumPy arrays and JAX arrays. However, it may not be full proof for all
+    possible array-like types or objects that mimic these properties without being suitable for
+    numerical operations.
+
+    """
+    # Check for array-like attributes
+    has_shape = hasattr(obj, "shape")
+    has_dtype = hasattr(obj, "dtype")
+    has_ndim = hasattr(obj, "ndim")
+
+    # Check for indexability (try to access the first element)
+    try:
+        obj[0]
+        is_indexable = True
+    except (TypeError, IndexError):
+        is_indexable = False
+
+    # Check for iterable property
+    try:
+        iter(obj)
+        is_iterable = True
+    except TypeError:
+        is_iterable = False
+
+    # not_tsd_type = not isinstance(obj, _AbstractTsd)
+
+    return (
+        has_shape and has_dtype and has_ndim and is_indexable and is_iterable
+        # and not_tsd_type
+    )
+
+
+def cast_to_jax(array, array_name, suppress_conversion_warnings=False):
+    """
+    Convert an input array-like object to a jax Array.
+
+
+    Parameters
+    ----------
+    array : array_like
+        The input object to convert. This can be any object that `np.asarray` is capable of
+        converting to a jax array, such as lists, tuples, and other array-like objects.
+    array_name : str
+        The name of the variable that we are converting, printed in the warning message.
+
+    Returns
+    -------
+    ndarray
+        A jax Array representation of the input `values`. If `values` is already a jax
+        Array, it is returned unchanged. Otherwise, a new jax Array is created and returned.
+
+    Warnings
+    --------
+    A warning is issued if the input `values` is not already a jax Array, indicating
+    that a conversion has taken place and showing the original type of the input.
+
+    """
+    if not isinstance(array, jnp.ndarray) and not suppress_conversion_warnings:
+        original_type = type(array).__name__
+        warnings.warn(
+            f"Converting '{array_name}' to jax.ndarray. The provided array was of type '{original_type}'.",
+            UserWarning,
+            stacklevel=2
+        )
+    return jnp.asarray(array)
+
+
+def convert_to_jax_array(array, array_name, suppress_conversion_warnings=False):
+    """Convert any array like object to jax Array.
+
+    Parameters
+    ----------
+    array : ArrayLike
+
+    array_name : str
+        Array name if RuntimeError is raised or object is casted to numpy
+
+    Returns
+    -------
+    jax.Array
+        Jax array object
+
+    Raises
+    ------
+    RuntimeError
+        If input can't be converted to jax array
+    """
+    if isinstance(array, Number):
+        return jnp.array([array])
+    elif isinstance(array, (list, tuple)):
+        return jnp.array(array)
+    elif isinstance(array, jnp.ndarray):
+        return array
+    elif isinstance(array, np.ndarray):
+        return cast_to_jax(array, array_name, suppress_conversion_warnings)
+    elif is_array_like(array):
+        return cast_to_jax(array, array_name, suppress_conversion_warnings)
+    else:
+        raise RuntimeError(
+            "Unknown format for {}. Accepted formats are numpy.ndarray, list, tuple or any array-like objects.".format(
+                array_name
+            )
+        )
 
 
 @jit(nopython=True)
