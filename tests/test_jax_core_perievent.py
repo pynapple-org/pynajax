@@ -3,7 +3,55 @@ from pynajax.jax_process_perievent import event_trigger_average, pad_and_roll
 from pynajax.utils import _get_idxs
 import pytest
 
-# Define test cases for each function
+
+@pytest.mark.parametrize(
+    "windows, array, expected_out",
+    [
+        (
+                (1, 0),
+                np.array([[1., 2.], [3., 4.], [5., 6.]]),
+                np.array([[[1., 2.], [3., 4.], [5., 6.]], [[np.nan, np.nan], [1., 2.], [3., 4.]]])
+        ),
+        (
+                (1, 1),
+                np.array([[1., 2.], [3., 4.], [5., 6.]]),
+                np.array([[[3., 4.], [5., 6.],[np.nan, np.nan]], [[1., 2.], [3., 4.], [5., 6.]], [[np.nan, np.nan], [1., 2.], [3., 4.]]])
+        ),
+        (
+                (0, 1),
+                np.array([[1., 2.], [3., 4.], [5., 6.]]),
+                np.array([[[3., 4.], [5., 6.], [np.nan, np.nan]], [[1., 2.], [3., 4.], [5., 6.]]])
+        ),
+        (
+                (2, 0),
+                np.array([[1., 2.], [3., 4.], [5., 6.]]),
+                np.array([[[1., 2.], [3., 4.], [5., 6.]], [[np.nan, np.nan], [1., 2.], [3., 4.]], [[np.nan, np.nan], [np.nan, np.nan], [1., 2.]]])
+        ),
+        (
+                (2, 2),
+                np.array([[1., 2.], [3., 4.], [5., 6.]]),
+                np.array([
+                    [[5., 6.], [np.nan, np.nan],  [np.nan, np.nan]],
+                    [[3., 4.], [5., 6.], [np.nan, np.nan]],
+                    [[1., 2.], [3., 4.], [5., 6.]],
+                    [[np.nan, np.nan], [1., 2.], [3., 4.]],
+                    [[np.nan, np.nan], [np.nan, np.nan], [1., 2.]],
+                ])
+        ),
+        (
+                (0, 2),
+                np.array([[1., 2.], [3., 4.], [5., 6.]]),
+                np.array([
+                    [[5., 6.], [np.nan, np.nan],  [np.nan, np.nan]],
+                    [[3., 4.], [5., 6.], [np.nan, np.nan]],
+                    [[1., 2.], [3., 4.], [5., 6.]]
+                ])
+        ),
+    ]
+)
+def test_pad_and_roll(windows, array, expected_out):
+    out = np.array(pad_and_roll(array, windows))
+    np.testing.assert_array_equal(out, expected_out)
 
 
 def test_get_idxs():
@@ -24,26 +72,55 @@ def test_get_idxs():
     assert np.array_equal(idx_end, expected_idx_end)
 
 
-def test_event_trigger_average():
-    # Define test input
-    time_target_array = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
-    count_array = np.array([[1, 2, 3], [4, 5, 6]])
-    time_array = np.array([0.01, 0.02, 0.03, 0.04, 0.05, 0.06])
-    data_array = np.array([[0.1, 0.2], [0.3, 0.4], [0.5, 0.6], [0.7, 0.8], [0.9, 1.0]])
-    starts = np.array([0.1, 0.2])
-    ends = np.array([0.3, 0.4])
+@pytest.mark.parametrize(
+    "counts, stimuli, expected_out",
+    [
+        (
+                np.array([[0.], [0.], [1.], [0.], [0.]]),
+                np.array([0., 0., 2., 0., 0.]),
+                np.array([[0.], [2.], [0.]])
+        ),
+        (
+                np.array([[0.], [1.], [1.], [0.], [0.]]),
+                np.array([0., 0., 2., 0., 0.]),
+                np.array([[0.], [1.], [1.]])
+        ),
+        (
+                np.array([[0.], [0.], [1.], [1.], [0.]]),
+                np.array([0., 0., 2., 0., 0.]),
+                np.array([[1.], [1.], [0.]])
+        ),
+        (
+                np.array([[0.], [0.], [0.], [0.], [1.]]),
+                np.array([0., 0., 0., 2., 0.]),
+                np.array([[2.], [0.], [0.]])
+        )
+    ]
+)
+def test_event_trigger_average_single_ep(counts, stimuli, expected_out):
+    time = np.arange(counts.shape[0])
     windows = (1, 1)
-    binsize = 0.01
-    batch_size = 2
+    binsize = 1.
+    starts = [0]
+    ends = [6]
+    out = event_trigger_average(time, counts, time, stimuli, starts, ends, windows, binsize, batch_size=128)
+    np.testing.assert_array_equal(out, expected_out)
 
-    # Call the function
-    result = event_trigger_average(time_target_array, count_array, time_array, data_array, starts, ends, windows,
-                                   binsize, batch_size)
-
-    # Define the expected output
-    expected_result = np.array(
-        [[[0.1, 0.2], [0.2, 0.3]], [[0.3, 0.4], [0.4, 0.5]], [[0.5, 0.6], [0.6, 0.7]], [[0.7, 0.8], [0.8, 0.9]],
-         [[0.9, 1.0], [1.0, 1.1]]])
-
-    # Assert statements to check the result
-    assert np.array_equal(result, expected_result)
+@pytest.mark.parametrize(
+    "counts, stimuli, expected_out",
+    [
+        (
+                np.array([[0.], [0.], [1.], [1.], [0], [0.]]),
+                np.array([0., 0., 2., 2., 0., 0.]),
+                np.array([[0.], [2.], [0.]])  # this would be [[1], [2], [1]] in a single epoch setting
+        )
+    ]
+)
+def test_event_trigger_average_multi_ep(counts, stimuli, expected_out):
+    time = np.arange(counts.shape[0])
+    windows = (1, 1)
+    binsize = 1.
+    starts = [0, 3]
+    ends = [2, 7]
+    out = event_trigger_average(time, counts, time, stimuli, starts, ends, windows, binsize, batch_size=128)
+    np.testing.assert_array_equal(out, expected_out)

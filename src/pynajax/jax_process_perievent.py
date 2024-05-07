@@ -48,9 +48,9 @@ def pad_and_roll(count_array, windows):
     pad = lambda x: jnp.pad(x, pad_width=(windows, (0, 0)), constant_values=np.nan)
     indices = jnp.arange(-windows[0], windows[1] + 1)[::-1]
     idx = jnp.arange(windows[0], n_samples + windows[0])
-    # idx = jnp.arange(windows[0], n_samples + windows[1])
     roll = jax.vmap(lambda i: jnp.roll(pad(count_array), -i, axis=0))
     return roll(indices)[:, idx]
+
 
 def event_trigger_average(
     time_target_array,
@@ -153,6 +153,6 @@ def event_trigger_average(
     # reshape back to original
     res = res.reshape((np.sum(windows) + 1, count_array.shape[-1], *shape[1:]))
 
-    res = np.apply_along_axis(jnp.divide, 1, res, tot_count)
+    res = jnp.apply_along_axis(jnp.divide, 1, res, tot_count)
 
     return res
