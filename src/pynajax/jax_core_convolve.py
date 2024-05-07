@@ -30,7 +30,9 @@ def _reshape_convolve_2d_kernel(tensor, kernel):
         The convolved tensor.
     """
     out = _convolve_mat(tensor.reshape(tensor.shape[0], -1), kernel)
-    return out.reshape((tensor.shape[0]+kernel.shape[0]-1,)+tensor.shape[1:]+(kernel.shape[1],))
+    return out.reshape(
+        (tensor.shape[0] + kernel.shape[0] - 1,) + tensor.shape[1:] + (kernel.shape[1],)
+    )
 
 
 @jax.jit
@@ -51,7 +53,7 @@ def _reshape_convolve_1d_kernel(tensor, kernel):
         The convolved tensor.
     """
     out = _convolve_vec(tensor.reshape(tensor.shape[0], -1), kernel)
-    return out.reshape((tensor.shape[0]+kernel.shape[0]-1,)+tensor.shape[1:])
+    return out.reshape((tensor.shape[0] + kernel.shape[0] - 1,) + tensor.shape[1:])
 
 
 @jax.jit
@@ -168,8 +170,8 @@ def convolve_intervals(time_array, data_array, starts, ends, kernel, trim="both"
     extra = (extra[0], extra[1] + 1)
 
     n = len(starts)
-    idx_start_shift = idx_start + np.arange(1, n+1)*extra[0] + np.arange(0, n)*extra[1]
-    idx_end_shift = idx_end + np.arange(1, n+1)*extra[0] + np.arange(0, n)*extra[1]
+    idx_start_shift = idx_start + np.arange(1, n + 1) * extra[0] + np.arange(0, n) * extra[1]
+    idx_end_shift = idx_end + np.arange(1, n + 1) * extra[0] + np.arange(0, n) * extra[1]
 
     idx = _get_slicing(idx_start_shift, idx_end_shift)
 
@@ -183,9 +185,6 @@ def convolve_intervals(time_array, data_array, starts, ends, kernel, trim="both"
     return convolved_data[idx]
 
 
-
-
-
 def convolve(time_array, data_array, starts, ends, kernel, trim="both"):
     """One-dimensional convolution."""
     # Perform convolution
@@ -196,7 +195,7 @@ def convolve(time_array, data_array, starts, ends, kernel, trim="both"):
 
     if len(starts) == 1 and len(ends) == 1:
         cut = _get_trim_idx(data_array.shape[0], kernel.shape[0], trim)
-        out = convolve_epoch(data_array, kernel)[cut[0]:cut[1]]
+        out = convolve_epoch(data_array, kernel)[cut[0] : cut[1]]
     else:
         out = convolve_intervals(time_array, data_array, starts, ends, kernel, trim)
 

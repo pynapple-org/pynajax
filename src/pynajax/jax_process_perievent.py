@@ -156,3 +156,7 @@ def event_trigger_average(
     res = jnp.apply_along_axis(jnp.divide, 1, res, tot_count)
 
     return res
+
+
+def perievent_continuous(time_array, data_array, time_target_array, starts, ends, windowsize):
+    pass

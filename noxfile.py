@@ -10,20 +10,23 @@ def copy_and_overwrite(from_path, to_path):
         shutil.rmtree(to_path)
     shutil.copytree(from_path, to_path)
 
+
 to_exclude = [
     "test_jitted.py",
-    "test_numpy_compatibility.py", # Pynajax has its own
+    "test_numpy_compatibility.py",  # Pynajax has its own
     "test_config.py",
-    "conftest.py"
-    ]
+    "conftest.py",
+]
 
-#nox --no-venv -s linters
-#nox --no-venv -s tests
+# nox --no-venv -s linters
+# nox --no-venv -s tests
+
 
 @nox.session(name="linters")
 def linters(session):
     """Run linters"""
     session.run("ruff", "check", "src", "--ignore", "D")
+
 
 @nox.session(name="tests")
 def tests(session):
@@ -42,7 +45,7 @@ def tests(session):
     copy_and_overwrite(nap_test_path.joinpath("nwbfilestest"), path.joinpath("nwbfilestest"))
 
     try:
-        session.run("pytest")#, "--pdb", "--pdbcls=IPython.terminal.debugger:Pdb")        
+        session.run("pytest")  # , "--pdb", "--pdbcls=IPython.terminal.debugger:Pdb")
     finally:
         # Remove files
         for f in tocopy:
@@ -52,12 +55,3 @@ def tests(session):
                 pass
         # Remove folders
         shutil.rmtree(path.joinpath("nwbfilestest"))
-
-
-
-
-
-
-
-
-

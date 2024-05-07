@@ -184,5 +184,3 @@ def bin_average(time_array, data_array, starts, ends, binsize):
     # Create a new time array with bin centers, and filter by in-epoch bins.
     time_array_new = edges[:-1] + binsize / 2
     return time_array_new[in_epoch], average[in_epoch]
-
-
