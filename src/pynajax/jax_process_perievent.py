@@ -158,5 +158,39 @@ def event_trigger_average(
     return res
 
 
-def perievent_continuous(time_array, data_array, time_target_array, starts, ends, windowsize):
-    pass
+def perievent_continuous(data_array, N_w, N_target, slice_idx, w_starts):
+    """
+    Extract data from data array.
+
+    Parameters
+    ----------
+    data_array : ArrayLike
+        The jax array to extract the data
+    N_w : int
+        window size
+    N_target : int
+        Number of reference time points
+    slice_idx : ArrayLike
+        2-d numpy array of size (N_target, 2). Each row is the start and end of the slice
+    w_starts : ArrayLike
+        1-d numpy array of size (N_target,). Whether to trim the window on the left when slicing
+    """
+    new_data_array = jnp.full((N_w, N_target, *data_array.shape[1:]), jnp.nan)
+
+    w_sizes = slice_idx[:, 1] - slice_idx[:, 0]  # Different sizes
+
+    all_w_sizes = np.unique(w_sizes)
+    all_w_start = np.unique(w_starts)
+
+    for w_size in all_w_sizes:
+        for w_start in all_w_start:
+            col_idx = w_sizes == w_size
+            new_idx = np.zeros((w_size, np.sum(col_idx)), dtype=int)
+            for i, tmp in enumerate(slice_idx[col_idx]):
+                new_idx[:, i] = np.arange(tmp[0], tmp[1])
+
+            new_data_array = new_data_array.at[w_start : w_start + w_size, col_idx].set(
+                data_array[new_idx]
+            )
+
+    return new_data_array
