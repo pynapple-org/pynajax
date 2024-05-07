@@ -92,7 +92,6 @@ def _fill_forward(
 
         idxs = np.searchsorted(t, ts, side="right") - 1
         filled_d[fill_idx : fill_idx + len(ts)][idxs >= 0] = d[idxs[idxs >= 0]]
-        # filled_d = filled_d.at[fill_idx : fill_idx + len(ts)][idxs >= 0].set(d[idxs[idxs >= 0]])
         fill_idx += len(ts)
 
     return filled_d
