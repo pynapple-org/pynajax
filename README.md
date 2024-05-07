@@ -8,10 +8,8 @@
 
 Welcome to `pynajax`, a GPU accelerated backend for [pynapple](https://github.com/pynapple-org/pynapple) built on top on [jax](https://github.com/google/jax). It offers a fast acceleration for the core pynapple functions using GPU. 
 
-
-!!! warning
-
-    This package is not meant to be used on its own. It should only be used through the pynapple API.
+> **Warning**
+> ⚠️ This package is not meant to be used on its own. It should only be used through the pynapple API.
 
 ## Installation
 Run the following `pip` command in your virtual environment.
