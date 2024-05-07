@@ -32,10 +32,14 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install .[dev]
 
+      - name: Clone and install pynapple
+        run: |
+          git clone -b dev https://github.com/pynapple-org/pynapple.git ../pynapple
+          pip install -e ../pynapple
+
       - name: Run nox
         run: |
-          nox --no-venv -s linters
-          nox --no-venv -s tests
+          nox
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3

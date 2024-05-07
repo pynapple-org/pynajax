@@ -5,12 +5,12 @@
 [![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
 [![pynajax CI](https://github.com/pynapple-org/pynajax/actions/workflows/ci.yml/badge.svg)](https://github.com/pynapple-org/pynajax/actions/workflows/ci.yml)
 
-Welcome to `pynajax`, a GPU accelerated backend for `pynapple` built on top on `JAX`.
-
-__The package is under active development and more methods will be added in the future.__
+Welcome to `pynajax`, a GPU accelerated backend for [pynapple](https://github.com/pynapple-org/pynapple) built on top on [jax](https://github.com/google/jax). It offers a fast acceleration for the core pynapple functions using GPU. 
 
 
-__For this package to work, `pynapple` must be installed from the branch `pynajax`.__
+!!! warning
+
+    This package is not meant to be used on its own. It should only be used through the pynapple API.
 
 
 ## Installation
@@ -18,12 +18,12 @@ Run the following `pip` command in your virtual environment.
 
 **For macOS/Linux users:**
  ```bash
- pip install git+https://github.com/pynapple-org/pynajax.git
+ pip install pynajax
  ```
 
 **For Windows users:**
  ```
- python -m pip install git+https://github.com/pynapple-org/pynajax.git
+ python -m pip install pynajax
  ```
 
 ## Basic usage
@@ -37,19 +37,14 @@ nap.nap_config.set_backend("jax")
 
 tsd = nap.Tsd(t=np.arange(100), d=np.random.randn(100))
 
-tsd.convolve(np.ones(11)) # This will run on GPU or CPU depending on the jax installation
+# This will run on GPU or CPU depending on the jax installation
+tsd.convolve(np.ones(11)) 
 ```
 
-## Benchmarks
+## Benchmark
 
-This benchmark for the `convolve` function was run on a NVIDIA GeForce GTX 1060.
+This benchmark for the `convolve` function was run on a GPU.
 
 ![benchmark_convolve](./images/convolve_benchmark.png)
 
-
-## Disclaimer
-
-Please note that this package is currently under development. While you can
-download and test the functionalities that are already present, please be aware
-that syntax and functionality may change before our preliminary release.
-
+See the documentation for others benchmarks.

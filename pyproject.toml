@@ -1,10 +1,11 @@
 [build-system]
-requires = ["setuptools", "setuptools-scm"]
+requires      = ["setuptools>=61.0.0", "setuptools-scm", "wheel"]
 build-backend = "setuptools.build_meta"
+
 
 [project]
 name = "pynajax"
-version = "0.1.0"
+version = "0.1.1"
 authors = [{name = "pynajax authors"}]
 description = "A JAX backend for pynapple."
 readme = "README.md"
@@ -19,13 +20,14 @@ classifiers = [
 ]
 
 # Define dependencies for the project
-dependencies = [
+dependencies = [    
     'jax>=0.4',                     # Numerical computing library
     'typing_extensions>=4.6',       # Typing extensions for Python
-    'pynapple @ git+https://github.com/pynapple-org/pynapple.git@pynajax',
-    'jaxlib'
+    'numpy',
+    'jaxlib',
+    'pynapple',
+    'numba'
 ]
-
 
 
 # Configure package discovery for setuptools
@@ -57,10 +59,12 @@ docs = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=pynajax"
 testpaths = ["tests"]
+addopts = "--cov=pynajax"
+
 
 [tool.ruff]
+line-length = 99
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -96,14 +100,13 @@ exclude = [
     "docs"
 ]
 
-# Set the maximum line length to 79.
-line-length = 79
 
 [tool.ruff.lint]
 # Add the `line-too-long` rule to the enforced rule set. By default, Ruff omits rules that
 # overlap with the use of a formatter, like Black, but we can override this behavior by
 # explicitly adding the rule.
-extend-select = ["D", "E", "F", "W", "B", "I"]
+extend-select = ["F", "W", "B", "I"]
+ignore = ["E731"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
