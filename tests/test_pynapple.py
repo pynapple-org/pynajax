@@ -1,9 +1,6 @@
 import pytest
 import sys
+import pynapple as nap
 
-
-def test_import_pynapple_and_set_backend():
-    import pynapple as nap
-    nap.nap_config.set_backend("jax")
-
-
+def test_backend():
+    assert nap.nap_config.backend == "jax"
