@@ -5,6 +5,7 @@
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![pynajax CI](https://github.com/pynapple-org/pynajax/actions/workflows/ci.yml/badge.svg)](https://github.com/pynapple-org/pynajax/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/pynapple-org/pynajax/badge.svg?branch=main)](https://coveralls.io/github/pynapple-org/pynajax?branch=main)
+![PyPI - Version](https://img.shields.io/pypi/v/pynajax)
 
 Welcome to `pynajax`, a GPU accelerated backend for [pynapple](https://github.com/pynapple-org/pynapple) built on top on [jax](https://github.com/google/jax). It offers a fast acceleration for the core pynapple functions using GPU. 
 
