@@ -9,23 +9,25 @@
       
       
       
-        <link rel="prev" href="../../SUMMARY/">
+        <link rel="prev" href="../jax_core_bin_average/">
       
+      
+        <link rel="next" href="../jax_core_threshold/">
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.4.8">
+      <meta name="generator" content="mkdocs-1.5.3, mkdocs-material-9.5.17">
     
     
       
-        <title>Pynajax - pynajax</title>
+        <title>Jax core convolve - pynajax</title>
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.4b4a2bd9.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.bcfcd587.min.css">
       
         
-        <link rel="stylesheet" href="../../../assets/stylesheets/palette.356b1318.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
       
       
 
@@ -50,9 +52,9 @@
     
       <link rel="stylesheet" href="../../../sg_gallery-dataframe.css">
     
-      <link rel="stylesheet" href="../../../sg_gallery.css">
-    
       <link rel="stylesheet" href="../../../sg_gallery-rendered-html.css">
+    
+      <link rel="stylesheet" href="../../../sg_gallery.css">
     
       <link rel="stylesheet" href="../../../sg_gallery-binder.css">
     
@@ -74,14 +76,13 @@
     <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="indigo">
   
     
-    
     <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
         
-        <a href="#pynajax.jax_core" class="md-skip">
+        <a href="#pynajax.jax_core_convolve" class="md-skip">
           Skip to content
         </a>
       
@@ -117,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Pynajax
+              Jax core convolve
             
           </span>
         </div>
@@ -125,6 +126,7 @@
     </div>
     
       
+    
     
     
     
@@ -170,7 +172,7 @@
         <a href="https://github.com/pynapple-org/pynajax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -216,7 +218,7 @@
       <a href="https://github.com/pynapple-org/pynajax" title="Go to repository" class="md-source" data-md-component="source">
   <div class="md-source__icon md-icon">
     
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
   </div>
   <div class="md-source__repository">
     GitHub
@@ -228,6 +230,7 @@
     
       
       
+  
   
   
   
@@ -250,6 +253,7 @@
   
   
   
+  
     
     
       
@@ -257,13 +261,19 @@
           
         
       
-    
+        
+      
+        
+      
+        
+      
+        
+      
     
     
     
     <li class="md-nav__item md-nav__item--nested">
       
-        
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
@@ -275,7 +285,7 @@
               
   
   <span class="md-ellipsis">
-    Tutorials
+    Benchmarks
   </span>
   
 
@@ -291,10 +301,94 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
-            Tutorials
+            Benchmarks
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/gallery/plot_benchmark_bin_average/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    bin_average
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/gallery/plot_benchmark_convolve/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    convolve
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/gallery/plot_benchmark_event_trigger_average/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    event_trigger_average
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../generated/gallery/plot_benchmark_threshold/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    threshold
+  </span>
+  
+
+      </a>
+    </li>
+  
+
               
             
           </ul>
@@ -311,18 +405,19 @@
     
   
   
+  
     
     
       
         
+          
+        
       
-    
     
     
     
     <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
-        
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
@@ -361,6 +456,85 @@
     
   
   
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_1" checked>
+        
+          
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  <span class="md-ellipsis">
+    Pynajax
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3_1" id="__nav_3_1_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_1">
+            <span class="md-nav__icon md-icon"></span>
+            Pynajax
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jax_core_bin_average/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Jax core bin average
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
     <li class="md-nav__item md-nav__item--active">
       
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
@@ -371,7 +545,7 @@
           
   
   <span class="md-ellipsis">
-    Pynajax
+    Jax core convolve
   </span>
   
 
@@ -382,7 +556,7 @@
         
   
   <span class="md-ellipsis">
-    Pynajax
+    Jax core convolve
   </span>
   
 
@@ -402,36 +576,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core" class="md-nav__link">
-    jax_core
+  <a href="#pynajax.jax_core_convolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      jax_core_convolve
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core.construct_nap" class="md-nav__link">
-    construct_nap()
+  <a href="#pynajax.jax_core_convolve.convolve_epoch" class="md-nav__link">
+    <span class="md-ellipsis">
+      convolve_epoch
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core.convolve_epoch" class="md-nav__link">
-    convolve_epoch()
+  <a href="#pynajax.jax_core_convolve.convolve_intervals" class="md-nav__link">
+    <span class="md-ellipsis">
+      convolve_intervals
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core.convolve_intervals" class="md-nav__link">
-    convolve_intervals()
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pynajax.jax_core.convolve" class="md-nav__link">
-    convolve()
+  <a href="#pynajax.jax_core_convolve.convolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      convolve
+    </span>
   </a>
   
 </li>
@@ -439,6 +614,77 @@
     </ul>
   
 </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jax_core_threshold/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Jax core threshold
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jax_process_perievent/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Jax process perievent
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Utils
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -477,36 +723,37 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core" class="md-nav__link">
-    jax_core
+  <a href="#pynajax.jax_core_convolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      jax_core_convolve
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core.construct_nap" class="md-nav__link">
-    construct_nap()
+  <a href="#pynajax.jax_core_convolve.convolve_epoch" class="md-nav__link">
+    <span class="md-ellipsis">
+      convolve_epoch
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core.convolve_epoch" class="md-nav__link">
-    convolve_epoch()
+  <a href="#pynajax.jax_core_convolve.convolve_intervals" class="md-nav__link">
+    <span class="md-ellipsis">
+      convolve_intervals
+    </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core.convolve_intervals" class="md-nav__link">
-    convolve_intervals()
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pynajax.jax_core.convolve" class="md-nav__link">
-    convolve()
+  <a href="#pynajax.jax_core_convolve.convolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      convolve
+    </span>
   </a>
   
 </li>
@@ -529,13 +776,13 @@
   
 
 
-  <h1>Pynajax</h1>
+  <h1>Jax core convolve</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<a id="pynajax.jax_core"></a>
+<a id="pynajax.jax_core_convolve"></a>
   <div class="doc doc-contents first">
   
       <p>Vectorized one-dimensional convolution.</p>
@@ -557,181 +804,7 @@
 
 
 
-
-<h2 id="pynajax.jax_core.construct_nap" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">construct_nap</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">time_support</span><span class="p">,</span> <span class="n">columns</span><span class="p">)</span></code>
-
-</h2>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Construct a pynapple timeseries object.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>time</code></td>
-          <td>
-                <code><span title="numpy.ndarray">ndarray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Array of time values.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>data</code></td>
-          <td>
-                <code><span title="numpy.ndarray">ndarray</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Array of data values.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>time_support</code></td>
-          <td>
-                <code><span title="pynapple.IntervalSet">IntervalSet</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Index representing the time support.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>columns</code></td>
-          <td>
-                <code>list or None</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>List of column names.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td>
-                <code>(<span title="pynapple.Tsd">Tsd</span>, <span title="pynapple.TsdFrame">TsdFrame</span>, <span title="pynapple.TsdTensor">TsdTensor</span>)</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>The constructed pynapple timeseries object.</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-          <details class="quote">
-            <summary>Source code in <code>src/pynajax/jax_core.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
-<span class="normal">116</span>
-<span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">construct_nap</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">time_support</span><span class="p">,</span> <span class="n">columns</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Construct a pynapple timeseries object.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    time : numpy.ndarray</span>
-<span class="sd">        Array of time values.</span>
-<span class="sd">    data : numpy.ndarray</span>
-<span class="sd">        Array of data values.</span>
-<span class="sd">    time_support : pynapple.IntervalSet</span>
-<span class="sd">        Index representing the time support.</span>
-<span class="sd">    columns : list or None</span>
-<span class="sd">        List of column names.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    : pynapple.Tsd, pynapple.TsdFrame, pynapple.TsdTensor</span>
-<span class="sd">        The constructed pynapple timeseries object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">nap</span><span class="o">.</span><span class="n">Tsd</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">time_support</span><span class="o">=</span><span class="n">time_support</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">data</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">nap</span><span class="o">.</span><span class="n">TsdFrame</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span><span class="p">,</span> <span class="n">time_support</span><span class="o">=</span><span class="n">time_support</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">nap</span><span class="o">.</span><span class="n">TsdTensor</span><span class="p">(</span><span class="n">t</span><span class="o">=</span><span class="n">time</span><span class="p">,</span> <span class="n">d</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">time_support</span><span class="o">=</span><span class="n">time_support</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">data</span>
-</code></pre></div></td></tr></table></div>
-          </details>
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h2 id="pynajax.jax_core.convolve_epoch" class="doc doc-heading">
+<h2 id="pynajax.jax_core_convolve.convolve_epoch" class="doc doc-heading">
           <code class="highlight language-python"><span class="n">convolve_epoch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span></code>
 
 </h2>
@@ -803,9 +876,10 @@ First dimension is assumed to be time.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Pynapple timeseries object with convolved data. If kernel is a 1-D array,
-the dimensions of the input data are retained. If kernel is a 2-D array,
-another (last) dimension is added to store convolution with every column of kernels.</p>
+              <p>Pynapple timeseries object with convolved data. If kernel
+is a 1-D array, the dimensions of the input data are retained.
+If kernel is a 2-D array,  another (last) dimension is added to
+store convolution with every column of kernels.</p>
             </div>
           </td>
         </tr>
@@ -813,31 +887,32 @@ another (last) dimension is added to store convolution with every column of kern
   </table>
 
           <details class="quote">
-            <summary>Source code in <code>src/pynajax/jax_core.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">131</span>
+            <summary>Source code in <code>src/pynajax/jax_core_convolve.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
 <span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
-<span class="normal">141</span>
-<span class="normal">142</span>
-<span class="normal">143</span>
-<span class="normal">144</span>
-<span class="normal">145</span>
-<span class="normal">146</span>
-<span class="normal">147</span>
-<span class="normal">148</span>
-<span class="normal">149</span>
-<span class="normal">150</span>
-<span class="normal">151</span>
-<span class="normal">152</span>
-<span class="normal">153</span>
-<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
+<span class="normal">133</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@jax</span><span class="o">.</span><span class="n">jit</span>
 <span class="k">def</span> <span class="nf">convolve_epoch</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convolve a single continuous temporal epoch.</span>
 
@@ -852,9 +927,10 @@ another (last) dimension is added to store convolution with every column of kern
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    pynapple.Tsd, pynapple.TsdFrame, pynapple.TsdTensor</span>
-<span class="sd">        Pynapple timeseries object with convolved data. If kernel is a 1-D array,</span>
-<span class="sd">        the dimensions of the input data are retained. If kernel is a 2-D array,</span>
-<span class="sd">        another (last) dimension is added to store convolution with every column of kernels.</span>
+<span class="sd">        Pynapple timeseries object with convolved data. If kernel</span>
+<span class="sd">        is a 1-D array, the dimensions of the input data are retained.</span>
+<span class="sd">        If kernel is a 2-D array,  another (last) dimension is added to</span>
+<span class="sd">        store convolution with every column of kernels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">kernel</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">_jit_tree_convolve_1d_kernel</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
@@ -872,9 +948,8 @@ another (last) dimension is added to store convolution with every column of kern
 
 
 
-
-<h2 id="pynajax.jax_core.convolve_intervals" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">convolve_intervals</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span></code>
+<h2 id="pynajax.jax_core_convolve.convolve_intervals" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">convolve_intervals</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">trim</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">)</span></code>
 
 </h2>
 
@@ -947,9 +1022,10 @@ First dimension is assumed to be time.</p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Pynapple timeseries object with convolved data. If kernel is a 1-D array,
-the dimensions of the input data are retained. If kernel is a 2-D array,
-another (last) dimension is added to store convolution with every column of kernels.</p>
+              <p>Pynapple timeseries object with convolved data. If kernel is a
+1-D array, the dimensions of the input data are retained. If kernel
+is a 2-D array, another (last) dimension is added to store
+convolution with every column of kernels.</p>
             </div>
           </td>
         </tr>
@@ -957,8 +1033,19 @@ another (last) dimension is added to store convolution with every column of kern
   </table>
 
           <details class="quote">
-            <summary>Source code in <code>src/pynajax/jax_core.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">157</span>
+            <summary>Source code in <code>src/pynajax/jax_core_convolve.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
 <span class="normal">158</span>
 <span class="normal">159</span>
 <span class="normal">160</span>
@@ -986,8 +1073,7 @@ another (last) dimension is added to store convolution with every column of kern
 <span class="normal">182</span>
 <span class="normal">183</span>
 <span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">convolve_intervals</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
+<span class="normal">185</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">convolve_intervals</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">trim</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convolve over the first dimension.</span>
 
 <span class="sd">    Convolve over the first dimension, vectorizing on every dimension of data,</span>
@@ -1004,19 +1090,29 @@ another (last) dimension is added to store convolution with every column of kern
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    : jax.ndarray</span>
-<span class="sd">        Pynapple timeseries object with convolved data. If kernel is a 1-D array,</span>
-<span class="sd">        the dimensions of the input data are retained. If kernel is a 2-D array,</span>
-<span class="sd">        another (last) dimension is added to store convolution with every column of kernels.</span>
+<span class="sd">        Pynapple timeseries object with convolved data. If kernel is a</span>
+<span class="sd">        1-D array, the dimensions of the input data are retained. If kernel</span>
+<span class="sd">        is a 2-D array, another (last) dimension is added to store</span>
+<span class="sd">        convolution with every column of kernels.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Create a tree of pynapple timeseries objects for each epoch</span>
-    <span class="n">tree</span> <span class="o">=</span> <span class="p">[</span><span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span><span class="o">.</span><span class="n">d</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">time_support</span><span class="o">.</span><span class="n">values</span><span class="p">]</span>
+    <span class="n">idx_start</span><span class="p">,</span> <span class="n">idx_end</span> <span class="o">=</span> <span class="n">_get_idxs</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)</span>
+    <span class="n">extra</span> <span class="o">=</span> <span class="n">_get_trim_idx</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">kernel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">trim</span><span class="p">)</span>
+    <span class="n">extra</span> <span class="o">=</span> <span class="p">(</span><span class="n">extra</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">extra</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">starts</span><span class="p">)</span>
+    <span class="n">idx_start_shift</span> <span class="o">=</span> <span class="n">idx_start</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">extra</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">extra</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">idx_end_shift</span> <span class="o">=</span> <span class="n">idx_end</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">extra</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span> <span class="o">*</span> <span class="n">extra</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">_get_slicing</span><span class="p">(</span><span class="n">idx_start_shift</span><span class="p">,</span> <span class="n">idx_end_shift</span><span class="p">)</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_array</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">idx_start</span><span class="p">,</span> <span class="n">idx_end</span><span class="p">)]</span>
 
     <span class="k">if</span> <span class="n">kernel</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">convolved_data</span> <span class="o">=</span> <span class="n">_jit_tree_convolve_1d_kernel</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">convolved_data</span> <span class="o">=</span> <span class="n">_jit_tree_convolve_2d_kernel</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">convolved_data</span>
+    <span class="k">return</span> <span class="n">convolved_data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
           </details>
   </div>
@@ -1028,9 +1124,8 @@ another (last) dimension is added to store convolution with every column of kern
 
 
 
-
-<h2 id="pynajax.jax_core.convolve" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">convolve</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span></code>
+<h2 id="pynajax.jax_core_convolve.convolve" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">convolve</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">trim</span><span class="o">=</span><span class="s1">&#39;both&#39;</span><span class="p">)</span></code>
 
 </h2>
 
@@ -1040,8 +1135,9 @@ another (last) dimension is added to store convolution with every column of kern
       <p>One-dimensional convolution.</p>
 
           <details class="quote">
-            <summary>Source code in <code>src/pynajax/jax_core.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">189</span>
+            <summary>Source code in <code>src/pynajax/jax_core_convolve.py</code></summary>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">188</span>
+<span class="normal">189</span>
 <span class="normal">190</span>
 <span class="normal">191</span>
 <span class="normal">192</span>
@@ -1054,20 +1150,19 @@ another (last) dimension is added to store convolution with every column of kern
 <span class="normal">199</span>
 <span class="normal">200</span>
 <span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">convolve</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel</span><span class="p">):</span>
+<span class="normal">202</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">convolve</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">trim</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;One-dimensional convolution.&quot;&quot;&quot;</span>
-
     <span class="c1"># Perform convolution</span>
     <span class="k">if</span> <span class="n">kernel</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span>
             <span class="s2">&quot;Provide a kernel with at least 1 dimension, current kernel has 0 dimensions&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">time_support</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">convolve_epoch</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">d</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">starts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ends</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">cut</span> <span class="o">=</span> <span class="n">_get_trim_idx</span><span class="p">(</span><span class="n">data_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">kernel</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">trim</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">convolve_epoch</span><span class="p">(</span><span class="n">data_array</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)[</span><span class="n">cut</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">cut</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">convolve_intervals</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">kernel</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">convolve_intervals</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">kernel</span><span class="p">,</span> <span class="n">trim</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">out</span>
 </code></pre></div></td></tr></table></div>
@@ -1088,11 +1183,19 @@ another (last) dimension is added to store convolution with every column of kern
 
 
 
+
+
+
+
+
+
+
                 
               </article>
             </div>
           
           
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
         </div>
         
       </main>
@@ -1121,10 +1224,10 @@ another (last) dimension is added to store convolution with every column of kern
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.indexes"], "search": "../../../assets/javascripts/workers/search.f886a092.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.indexes"], "search": "../../../assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.81fa17fe.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.1e8ae164.min.js"></script>
       
         <script src="../../../javascripts/katex.js"></script>
       
