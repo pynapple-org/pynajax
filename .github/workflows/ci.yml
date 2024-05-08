@@ -41,10 +41,12 @@ jobs:
         run: |
           nox
 
-      - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v3
+      - name: Coveralls
         env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            pip install coveralls
+            coveralls --service=github
 
   check:
     if: always()

@@ -26,7 +26,7 @@ def get_mean_perf_class(tsg, tsd, ep, binsize):
 
 def benchmark_event_trigger_average(binsize):
     times = []
-    for T in np.arange(500000, 800000, 100000):
+    for T in np.arange(100000, 1000000, 100000):
         time_array = np.arange(T) / 2
         data_array = np.arange(16 * T).reshape(T, 4, 2, 2)
         starts = np.arange(1, T // 2 - 1, 20)
