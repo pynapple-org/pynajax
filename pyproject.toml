@@ -110,3 +110,11 @@ ignore = ["E731"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
+
+[tool.coverage.report] # Numba compiled functions
+exclude_also = [
+    "def _get_bin_edges",
+    "def _get_mask_and_count",
+    "def _get_idxs",
+    "def _get_slicing"    
+]
