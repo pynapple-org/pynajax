@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pynajax"
-version = "0.1.1"
+version = "0.1.2"
 authors = [{name = "pynajax authors"}]
 description = "A JAX backend for pynapple."
 readme = "README.md"
