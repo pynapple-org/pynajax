@@ -124,3 +124,37 @@ def test_event_trigger_average_multi_ep(counts, stimuli, expected_out):
     ends = [2, 7]
     out = event_trigger_average(time, counts, time, stimuli, starts, ends, windows, binsize, batch_size=128)
     np.testing.assert_array_equal(out, expected_out)
+
+
+@pytest.mark.parametrize(
+    "counts, stimuli, expected_out",
+    [
+        (
+                np.array([[0.], [0.], [1.], [0.], [0.]]),
+                np.zeros((5, 3, 4)),
+                np.zeros((3, 1, 3, 4))
+        ),
+        (
+                np.repeat(
+                    np.array([[0.], [0.], [1.], [0.], [0.]]),
+                    2,1
+                    ),
+                np.zeros((5, 12)),
+                np.zeros((3, 2, 12))
+        )
+    ]
+)
+def test_event_trigger_average_batch_size(counts, stimuli, expected_out):
+    stimuli[2] = 2.0
+    expected_out[1] = 2.0
+    
+    time = np.arange(counts.shape[0])
+    windows = (1, 1)
+    binsize = 1.
+    starts = [0]
+    ends = [6]
+    out = event_trigger_average(
+        time, counts, time, stimuli, starts, ends, 
+        windows, binsize, batch_size=5
+        )
+    np.testing.assert_array_equal(out, expected_out)

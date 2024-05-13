@@ -145,9 +145,8 @@ def event_trigger_average(
         # compute residual slice
         slc = data_array[:, -extra_elements:]
         slc = jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
-
         resid = _dot_prod_feature(count_array, slc)
-        resid = resid.transpose(1, 2, 0).reshape(*res.shape[:-1], -1)
+        # resid = resid.transpose(1, 2, 0).reshape(*res.shape[:-1], -1)
         res = np.concatenate([res, resid], axis=2)
 
     # reshape back to original
