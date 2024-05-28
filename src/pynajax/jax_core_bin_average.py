@@ -174,6 +174,9 @@ def bin_average(time_array, data_array, starts, ends, binsize):
     data_array_new : jax.numpy.ndarray
         New data array containing the averaged values.
     """
+    if not isinstance(data_array, jnp.ndarray):
+        data_array = jnp.asarray(data_array)
+
     # Calculate bin edges and identify time points within epochs for averaging.
     ix, edges, in_epoch = _get_bin_edges(time_array, starts, ends, binsize=binsize)
 
