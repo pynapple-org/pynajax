@@ -28,7 +28,7 @@ def threshold(time_array, data_array, starts, ends, thr, method):
     """
     if not isinstance(data_array, jnp.ndarray):
         data_array = jnp.asarray(data_array)
-    
+
     idx_start, idx_end = _get_idxs(time_array, starts, ends)
     idx_slicing = _get_slicing(idx_start, idx_end)
 
