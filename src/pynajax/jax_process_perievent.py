@@ -174,6 +174,10 @@ def perievent_continuous(data_array, N_w, N_target, slice_idx, w_starts):
     w_starts : ArrayLike
         1-d numpy array of size (N_target,). Whether to trim the window on the left when slicing
     """
+
+    if not isinstance(data_array, jnp.ndarray):
+        data_array = jnp.asarray(data_array)
+
     new_data_array = jnp.full((N_w, N_target, *data_array.shape[1:]), jnp.nan)
 
     w_sizes = slice_idx[:, 1] - slice_idx[:, 0]  # Different sizes

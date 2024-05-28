@@ -187,6 +187,10 @@ def convolve_intervals(time_array, data_array, starts, ends, kernel, trim="both"
 
 def convolve(time_array, data_array, starts, ends, kernel, trim="both"):
     """One-dimensional convolution."""
+
+    if not isinstance(data_array, jnp.ndarray):
+        data_array = jnp.asarray(data_array)
+
     # Perform convolution
     if kernel.ndim == 0:
         raise IOError(
