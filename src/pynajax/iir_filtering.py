@@ -154,7 +154,7 @@ def iir_filter(b, a, time_array, data_array, starts, ends):
         )
         # convolve
         b_sig = _vmap_conv(agu_data, b)
-        # add nans in epochs
+        # add nans between epochs
         b_sig = jnp.full(b_sig.shape, jnp.nan).at[ix_shift].set(b_sig[ix_shift])
         # run recursion
         out = _vmap_recursion(b_sig, a)

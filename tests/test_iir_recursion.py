@@ -2,7 +2,7 @@ import numpy as np
 import pynapple as nap
 import pytest
 import scipy.signal as signal
-from pynajax.recursive_filter import iir_filter
+from pynajax.iir_filtering import iir_filter
 
 
 def _naive_multiepoch_filtering(b, a, tsdframe: nap.TsdFrame):
