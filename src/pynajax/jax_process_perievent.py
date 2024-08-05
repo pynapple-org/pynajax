@@ -62,13 +62,19 @@ def event_trigger_average(
     # Need to bring data_target_array to same shape as count_array
     # bin_average
     if count_array.shape[0] < data_array.shape[0]:
-        time_array, data_array = bin_average(time_array, data_array, starts, ends, binsize)
+        time_array, data_array = bin_average(
+            time_array, data_array, starts, ends, binsize
+        )
     # fill_forward
     else:
-        data_array = _fill_forward(time_target_array, time_array, data_array, starts, ends)
+        data_array = _fill_forward(
+            time_target_array, time_array, data_array, starts, ends
+        )
 
     idx_start, idx_end = _get_idxs(time_target_array, starts, ends)
-    idx_start_shift, idx_end_shift = _get_shifted_indices(idx_start, idx_end, np.sum(windows) + 1)
+    idx_start_shift, idx_end_shift = _get_shifted_indices(
+        idx_start, idx_end, np.sum(windows) + 1
+    )
 
     # get the indices for setting elements
     ix_orig = _get_slicing(idx_start, idx_end)
@@ -90,13 +96,19 @@ def event_trigger_average(
     tot_count = jnp.sum(count_array, 0)
 
     count_array = (
-        jnp.full((tot_size, *count_array.shape[1:]), np.nan).at[ix_shift].set(count_array[ix_orig])
+        jnp.full((tot_size, *count_array.shape[1:]), np.nan)
+        .at[ix_shift]
+        .set(count_array[ix_orig])
     )
     count_array = pad_and_roll(count_array, windows)
 
     def scan_fn(carry, x):
-        slc = jax.lax.dynamic_slice(data_array, (0, carry), (data_array.shape[0], batch_size))
-        slc = jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
+        slc = jax.lax.dynamic_slice(
+            data_array, (0, carry), (data_array.shape[0], batch_size)
+        )
+        slc = (
+            jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
+        )
         batch_result = _dot_prod_feature(count_array, slc)
         return carry + batch_size, batch_result
 
@@ -109,7 +121,9 @@ def event_trigger_average(
     if extra_elements:
         # compute residual slice
         slc = data_array[:, -extra_elements:]
-        slc = jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
+        slc = (
+            jnp.full((tot_size, *slc.shape[1:]), np.nan).at[ix_shift].set(slc[ix_orig])
+        )
         resid = _dot_prod_feature(count_array, slc)
         # resid = resid.transpose(1, 2, 0).reshape(*res.shape[:-1], -1)
         res = np.concatenate([res, resid], axis=2)

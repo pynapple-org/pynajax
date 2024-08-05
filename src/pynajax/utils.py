@@ -1,10 +1,11 @@
 import warnings
 from numbers import Number
 
+import jax
 import jax.numpy as jnp
 import numpy as np
 from numba import jit
-import jax
+
 
 def is_array_like(obj):
     """
@@ -56,7 +57,11 @@ def is_array_like(obj):
     # not_tsd_type = not isinstance(obj, _AbstractTsd)
 
     return (
-        has_shape and has_dtype and has_ndim and is_indexable and is_iterable
+        has_shape
+        and has_dtype
+        and has_ndim
+        and is_indexable
+        and is_iterable
         # and not_tsd_type
     )
 
@@ -91,7 +96,7 @@ def cast_to_jax(array, array_name, suppress_conversion_warnings=False):
         warnings.warn(
             f"Converting '{array_name}' to jax.ndarray. The provided array was of type '{original_type}'.",
             UserWarning,
-            stacklevel=2
+            stacklevel=2,
         )
     return jnp.asarray(array)
 
@@ -310,7 +315,9 @@ def pad_and_roll(count_array, windows, constant_value=np.nan):
     statistical or computational errors.
     """
     n_samples = count_array.shape[0]
-    pad = lambda x: jnp.pad(x, pad_width=(windows, (0, 0)), constant_values=constant_value)
+    pad = lambda x: jnp.pad(
+        x, pad_width=(windows, (0, 0)), constant_values=constant_value
+    )
     indices = jnp.arange(-windows[0], windows[1] + 1)[::-1]
     idx = jnp.arange(windows[0], n_samples + windows[0])
     roll = jax.vmap(lambda i: jnp.roll(pad(count_array), -i, axis=0))

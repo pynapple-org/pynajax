@@ -170,8 +170,12 @@ def convolve_intervals(time_array, data_array, starts, ends, kernel, trim="both"
     extra = (extra[0], extra[1] + 1)
 
     n = len(starts)
-    idx_start_shift = idx_start + np.arange(1, n + 1) * extra[0] + np.arange(0, n) * extra[1]
-    idx_end_shift = idx_end + np.arange(1, n + 1) * extra[0] + np.arange(0, n) * extra[1]
+    idx_start_shift = (
+        idx_start + np.arange(1, n + 1) * extra[0] + np.arange(0, n) * extra[1]
+    )
+    idx_end_shift = (
+        idx_end + np.arange(1, n + 1) * extra[0] + np.arange(0, n) * extra[1]
+    )
 
     idx = _get_slicing(idx_start_shift, idx_end_shift)
 

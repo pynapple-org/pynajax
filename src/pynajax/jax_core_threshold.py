@@ -47,10 +47,12 @@ def threshold(time_array, data_array, starts, ends, thr, method):
     ix2 = jnp.diff(ix * 1)
 
     new_starts = (
-        time_array[1:][ix2 == 1] - (time_array[1:][ix2 == 1] - time_array[0:-1][ix2 == 1]) / 2
+        time_array[1:][ix2 == 1]
+        - (time_array[1:][ix2 == 1] - time_array[0:-1][ix2 == 1]) / 2
     )
     new_ends = (
-        time_array[0:-1][ix2 == -1] + (time_array[1:][ix2 == -1] - time_array[0:-1][ix2 == -1]) / 2
+        time_array[0:-1][ix2 == -1]
+        + (time_array[1:][ix2 == -1] - time_array[0:-1][ix2 == -1]) / 2
     )
 
     if ix[0]:  # First element to keep as start

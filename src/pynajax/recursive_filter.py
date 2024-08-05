@@ -1,8 +1,5 @@
-from functools import partial
-
 import jax
 import jax.numpy as jnp
-import numpy as np
 
 from .utils import _get_idxs, _get_shifted_indices, _get_slicing
 
@@ -45,7 +42,7 @@ _vmap_recursion = jax.vmap(_recursion_loop, in_axes=(1, None), out_axes=1)
 
 # vectorize the convolution
 def _conv(signal, b):
-    return jnp.convolve(signal, b, mode="full")[:len(signal)]
+    return jnp.convolve(signal, b, mode="full")[: len(signal)]
 
 
 _vmap_conv = jax.vmap(_conv, in_axes=(1, None), out_axes=1)
@@ -106,7 +103,9 @@ def _insert_constant(time_array, data_array, starts, ends, window_size, const=jn
     # get the indexes of start and end
     idx_start, idx_end = _get_idxs(time_array, starts, ends)
     # shift by a window every epoch
-    idx_start_shift, idx_end_shift = _get_shifted_indices(idx_start, idx_end, window_size + 1)
+    idx_start_shift, idx_end_shift = _get_shifted_indices(
+        idx_start, idx_end, window_size + 1
+    )
 
     # get the indices for setting elements
     ix_orig = _get_slicing(idx_start, idx_end)
@@ -114,7 +113,9 @@ def _insert_constant(time_array, data_array, starts, ends, window_size, const=jn
 
     tot_size = ix_shift[-1] - ix_shift[0] + 1
     data_array = (
-        jnp.full((tot_size, *data_array.shape[1:]), const).at[ix_shift].set(data_array[ix_orig])
+        jnp.full((tot_size, *data_array.shape[1:]), const)
+        .at[ix_shift]
+        .set(data_array[ix_orig])
     )
     return data_array, ix_orig, ix_shift
 
@@ -148,7 +149,9 @@ def iir_filter(b, a, time_array, data_array, starts, ends):
     data_array = data_array.reshape(data_array.shape[0], -1)
     if len(starts):
         # interleave with 0
-        agu_data, ix_orig, ix_shift = _insert_constant(time_array, data_array, starts, ends, len(b) - 1, const=0.)
+        agu_data, ix_orig, ix_shift = _insert_constant(
+            time_array, data_array, starts, ends, len(b) - 1, const=0.0
+        )
         # convolve
         b_sig = _vmap_conv(agu_data, b)
         # add nans in epochs
