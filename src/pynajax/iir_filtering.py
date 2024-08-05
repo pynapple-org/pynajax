@@ -120,7 +120,7 @@ def _insert_constant(time_array, data_array, starts, ends, window_size, const=jn
     return data_array, ix_orig, ix_shift
 
 
-def iir_filter(b, a, time_array, data_array, starts, ends):
+def lfilter(b, a, time_array, data_array, starts, ends):
     """
     Filter the data for multiple epochs.
 

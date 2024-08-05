@@ -265,9 +265,9 @@ def _get_slicing(idx_start, idx_end):
 
     Parameters
     ----------
-    idx_start : ArrayLike
+    idx_start : NDArray
         Array of start indices.
-    idx_end : ArrayLike
+    idx_end : NDArray
         Array of end indices.
 
     Returns
@@ -281,6 +281,36 @@ def _get_slicing(idx_start, idx_end):
     for st, en in zip(idx_start, idx_end):
         for k in range(st, en):
             ix[cnt] = k
+            cnt += 1
+    return ix
+
+
+@jit(nopython=True)
+def _revert_epochs(time_array, starts, ends):
+    """
+    Generate an array of indices for reversing data order within each epoch.
+
+    Parameters
+    ----------
+    time_array : array_like
+        The sorted array of timestamps.
+    starts : array_like
+        An array of start times for which indices are required in `time_array`.
+    ends : array_like
+        An array of end times for which indices are required in `time_array`.
+
+    Returns
+    -------
+    : ArrayLike
+        An array of indices constructed from the start and end indices.
+    """
+    idx_start, idx_end = _get_idxs(time_array, starts, ends)
+    iend = np.sum(idx_end - idx_start)
+    ix = np.zeros(iend, dtype=np.int32)
+    cnt = 0
+    for st, en in zip(idx_start, idx_end):
+        for k in range(st, en):
+            ix[cnt] = en + st - k - 1
             cnt += 1
     return ix
 
