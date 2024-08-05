@@ -1,6 +1,6 @@
 import numpy as np
-from pynajax.jax_process_perievent import event_trigger_average, pad_and_roll
-from pynajax.utils import _get_idxs
+from pynajax.jax_process_perievent import event_trigger_average
+from pynajax.utils import _get_idxs, pad_and_roll
 import pytest
 
 

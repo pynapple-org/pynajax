@@ -4,7 +4,7 @@ from numbers import Number
 import jax.numpy as jnp
 import numpy as np
 from numba import jit
-
+import jax
 
 def is_array_like(obj):
     """
@@ -278,3 +278,40 @@ def _get_slicing(idx_start, idx_end):
             ix[cnt] = k
             cnt += 1
     return ix
+
+
+def pad_and_roll(count_array, windows, constant_value=np.nan):
+    """
+    Pad and roll the input array to generate shifted versions of the array according
+    to specified window size and padding direction.
+
+    Parameters
+    ----------
+    count_array : ArrayLike
+        The input array to pad and roll. This is typically a count or spike array in
+        neural data analysis.
+    windows : tuple of int
+        The number of steps to include in the window. This defines the extent of the
+        rolling operation.
+    constant_value: float
+        Padding constant
+
+    Returns
+    -------
+    ArrayLike
+        A 2D array where each row represents the input array rolled by one step in
+        the range defined by the window and padding type. Only the valid range (original
+        data indices) is returned.
+
+    Notes
+    -----
+    The function uses `np.nan` for padding, which may need to be considered in subsequent
+    calculations. Depending on the analysis, handling of `np.nan` may be required to avoid
+    statistical or computational errors.
+    """
+    n_samples = count_array.shape[0]
+    pad = lambda x: jnp.pad(x, pad_width=(windows, (0, 0)), constant_values=constant_value)
+    indices = jnp.arange(-windows[0], windows[1] + 1)[::-1]
+    idx = jnp.arange(windows[0], n_samples + windows[0])
+    roll = jax.vmap(lambda i: jnp.roll(pad(count_array), -i, axis=0))
+    return roll(indices)[:, idx]

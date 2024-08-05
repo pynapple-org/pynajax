@@ -4,7 +4,7 @@ import numpy as np
 
 from pynajax.jax_core_bin_average import bin_average
 
-from .utils import _fill_forward, _get_idxs, _get_shifted_indices, _get_slicing
+from .utils import _fill_forward, _get_idxs, _get_shifted_indices, _get_slicing, pad_and_roll
 
 # dot prod shifted counts vs 1D var y vmapped over shift
 # [(n_shift, T), (T, )] -> (n_shift, )
@@ -15,41 +15,6 @@ _dot_prod_neu = jax.vmap(_dot_prod, in_axes=(2, None), out_axes=1)
 # vmap over the features
 # [(n_shift, T, n_neurons), (T, n_features)] -> (n_shift, n_neurons, n_features)
 _dot_prod_feature = jax.vmap(_dot_prod_neu, in_axes=(None, 1), out_axes=2)
-
-
-def pad_and_roll(count_array, windows):
-    """
-    Pad and roll the input array to generate shifted versions of the array according
-    to specified window size and padding direction.
-
-    Parameters
-    ----------
-    count_array : ArrayLike
-        The input array to pad and roll. This is typically a count or spike array in
-        neural data analysis.
-    windows : tuple of int
-        The number of steps to include in the window. This defines the extent of the
-        rolling operation.
-
-    Returns
-    -------
-    ArrayLike
-        A 2D array where each row represents the input array rolled by one step in
-        the range defined by the window and padding type. Only the valid range (original
-        data indices) is returned.
-
-    Notes
-    -----
-    The function uses `np.nan` for padding, which may need to be considered in subsequent
-    calculations. Depending on the analysis, handling of `np.nan` may be required to avoid
-    statistical or computational errors.
-    """
-    n_samples = count_array.shape[0]
-    pad = lambda x: jnp.pad(x, pad_width=(windows, (0, 0)), constant_values=np.nan)
-    indices = jnp.arange(-windows[0], windows[1] + 1)[::-1]
-    idx = jnp.arange(windows[0], n_samples + windows[0])
-    roll = jax.vmap(lambda i: jnp.roll(pad(count_array), -i, axis=0))
-    return roll(indices)[:, idx]
 
 
 def event_trigger_average(
