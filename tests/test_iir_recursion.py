@@ -1,8 +1,8 @@
-from pynajax.recursive_filter import iir_filter
-import scipy.signal as signal
-import pytest
 import numpy as np
 import pynapple as nap
+import pytest
+import scipy.signal as signal
+from pynajax.recursive_filter import iir_filter
 
 
 def _naive_multiepoch_filtering(b, a, tsdframe: nap.TsdFrame):
@@ -91,7 +91,7 @@ def test_filter_recursion_single_band_multiepoch_tsd(wn, order, btype, n_sig, ep
         nap.IntervalSet(start=[0, 50, 80], end=[40, 90, 1000])
     ]
 )
-def test_filter_recursion_single_band_multiepoch_tsd(wn, order, btype, n_sig, ep):
+def test_filter_recursion_single_band_multiepoch_tsdtensor(wn, order, btype, n_sig, ep):
     sig = np.random.normal(size=(1000, 2, 3))
     sig = nap.TsdTensor(t=np.arange(sig.shape[0]), d=sig, time_support=ep)
     sig_frame = nap.TsdFrame(t=sig.t, d=sig.d.reshape(sig.shape[0], -1), time_support=ep)

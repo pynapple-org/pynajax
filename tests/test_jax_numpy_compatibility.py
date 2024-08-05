@@ -1,10 +1,9 @@
-import pynapple as nap
+import jax
 import numpy as np
+import numpy.core.umath as _umath
+import pynapple as nap
 import pytest
 from numpy import ufunc as _ufunc
-import numpy.core.umath as _umath
-import jax
-
 
 ufuncs = {k:obj for k, obj in _umath.__dict__.items() if isinstance(obj, _ufunc)}
 
@@ -319,8 +318,10 @@ class Test_Time_Series_1:
 
             if tsd.ndim>1:
                 a = func(tsd, 1)
-                if a.ndim == 1: assert isinstance(a, nap.Tsd)
-                if a.ndim == 2: assert isinstance(a, nap.TsdFrame)
+                if a.ndim == 1:
+                    assert isinstance(a, nap.Tsd)
+                if a.ndim == 2:
+                    assert isinstance(a, nap.TsdFrame)
                 assert np.allclose(a.values, func(tsd.values, 1))
                 assert np.allclose(a.index, tsd.index)
 
@@ -334,16 +335,16 @@ class Test_Time_Series_1:
     def test_statistics(self, tsd):
 
         for func in [np.percentile, np.nanpercentile, np.quantile, np.nanquantile]:
-            a = np.percentile(tsd, 50)
-            assert a == np.percentile(tsd.values, 50)
+            a = func(tsd, 0.5)
+            assert a == func(tsd.values, 0.5)
 
-            if tsd.ndim>1:
-                a = np.percentile(tsd, 50, 1)
+            if tsd.ndim > 1:
+                a = func(tsd, 0.5, 1)
                 assert isinstance(a, (nap.Tsd, nap.TsdFrame, nap.TsdTensor))
 
         for func in [np.median, np.average, np.mean, np.std, np.var, np.nanmedian, np.nanmean, np.nanstd, np.nanvar]:
-            a = np.percentile(tsd, 50)
-            assert a == np.percentile(tsd.values, 50)
+            a = func(tsd)
+            assert a == func(tsd.values)
 
             if tsd.ndim>1:
                 a = np.percentile(tsd, 50, 1)

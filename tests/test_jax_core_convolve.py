@@ -1,12 +1,8 @@
-import itertools
 
 import jax.numpy as jnp
 import numpy as np
 import pytest
-
 from pynajax import jax_core_convolve
-
-from contextlib import nullcontext as does_not_raise
 
 
 @pytest.mark.parametrize(
@@ -80,8 +76,8 @@ def test_2d_convolve_epoch_mat(shape_array1, shape_array2):
 def test_convolve_intervals(time_array, data_array, ep, kernel):
     """Run convolution on single and multi interval."""
     jax_core_convolve.convolve_intervals(
-        time_array, 
-        data_array, 
+        time_array,
+        data_array,
         ep[:,0],
         ep[:,1],
         kernel
@@ -112,7 +108,7 @@ def test_convolve_intervals(time_array, data_array, ep, kernel):
     ],
 )
 def test_convolve_intervals_shape_1d_kernel(time, data, iset, kernel):
-    """Check that the shape of input and output matches if kernel is 1D."""    
+    """Check that the shape of input and output matches if kernel is 1D."""
     expected_shape = data.shape
     res = jax_core_convolve.convolve_intervals(time, data, iset[:,0], iset[:,1], kernel)
     assert all(res.shape[i] == expected_shape[i] for i in range(data.ndim))
@@ -146,7 +142,7 @@ def test_convolve_intervals_shape_2d_kernel(time, data, iset, kernel):
     """
     Check that the shape of output is equal to that of the input
     plus the second dimension of the kernel attached at the end.
-    """    
+    """
     expected_shape = (*data.shape, kernel.shape[1])
     res = jax_core_convolve.convolve_intervals(time, data, iset[:,0], iset[:,1], kernel)
     assert all(res.shape[i] == expected_shape[i] for i in range(data.ndim))
@@ -186,8 +182,8 @@ def test_convolve_intervals_shape_2d_kernel(time, data, iset, kernel):
 def test_convolve(time_array, data_array, ep, kernel):
     """Run convolution on single and multi interval."""
     jax_core_convolve.convolve(
-        time_array, 
-        data_array, 
+        time_array,
+        data_array,
         ep[:,0],
         ep[:,1],
         kernel
