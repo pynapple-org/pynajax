@@ -1,12 +1,13 @@
 import jax
 import jax.numpy as jnp
+import numpy as np
 
 from .utils import _get_idxs, _get_shifted_indices, _get_slicing
 
 
 # Define the IIR recursion
 @jax.jit
-def _recursion_loop(b_signal, a):
+def _recursion_loop(b_signal, a, zi):
     """
     Recursion loop for an IIR filter.
 
@@ -21,23 +22,25 @@ def _recursion_loop(b_signal, a):
     -------
 
     """
-    past_out = jnp.zeros((len(a) - 1,))
+    past_out = jnp.zeros((len(a) - 1, ))
+    zi = jnp.zeros(len(b_signal)).at[:len(zi)].set(zi)
 
     def recursion_step(carry, x):
-        out_past = carry
-        new = (x - jnp.dot(a[1:], out_past)) / a[0]
+        i, out_past = carry
+        new = (x - jnp.dot(a[1:], out_past)) + zi[i]
         new *= ~jnp.isnan(new)
         # Roll out
         out_past = jnp.hstack([new, out_past[:-1]])
-        return out_past, new
+        i += 1
+        return (i, out_past), new
 
-    _, res = jax.lax.scan(recursion_step, past_out, b_signal)
+    _, res = jax.lax.scan(recursion_step, (0, past_out), b_signal)
 
     return res
 
 
 # vectorize the recursion over signals.
-_vmap_recursion = jax.vmap(_recursion_loop, in_axes=(1, None), out_axes=1)
+_vmap_recursion = jax.vmap(_recursion_loop, in_axes=(1, None, None), out_axes=1)
 
 
 # vectorize the convolution
@@ -48,8 +51,8 @@ def _conv(signal, b):
 _vmap_conv = jax.vmap(_conv, in_axes=(1, None), out_axes=1)
 
 
-@jax.jit
-def _iir_filter(b, a, signals):
+#@jax.jit
+def _iir_filter(b, a, signals, zi):
     """
     Vectorized IIR filtering recursion.
 
@@ -67,8 +70,10 @@ def _iir_filter(b, a, signals):
     :
         Filtered signal.
     """
+    b /= a[0]
+    a /= a[0]
     b_sig = _vmap_conv(signals, b)
-    return _vmap_recursion(b_sig, a)
+    return _vmap_recursion(b_sig, a, zi)
 
 
 def _insert_constant(time_array, data_array, starts, ends, window_size, const=jnp.nan):
@@ -120,7 +125,7 @@ def _insert_constant(time_array, data_array, starts, ends, window_size, const=jn
     return data_array, ix_orig, ix_shift
 
 
-def lfilter(b, a, time_array, data_array, starts, ends):
+def lfilter(b, a, time_array, data_array, starts, ends, zi=None):
     """
     Filter the data for multiple epochs.
 
@@ -147,19 +152,29 @@ def lfilter(b, a, time_array, data_array, starts, ends):
     """
     orig_shape = data_array.shape
     data_array = data_array.reshape(data_array.shape[0], -1)
+
+    if zi is None:
+        zi = jnp.zeros((len(a) - 1, ))
+
     if len(starts):
+        # normalize
+        b /= a[0]
+        a /= a[0]
         # interleave with 0
         agu_data, ix_orig, ix_shift = _insert_constant(
             time_array, data_array, starts, ends, len(b) - 1, const=0.0
         )
         # convolve
         b_sig = _vmap_conv(agu_data, b)
+
+        # set zis
+
         # add nans between epochs
         b_sig = jnp.full(b_sig.shape, jnp.nan).at[ix_shift].set(b_sig[ix_shift])
         # run recursion
-        out = _vmap_recursion(b_sig, a)
+        out = _vmap_recursion(b_sig, a, zi)
         # remove the extra values
         out = jnp.zeros(data_array.shape).at[ix_orig].set(out[ix_shift])
     else:
-        out = _iir_filter(b, a, data_array)
+        out = _iir_filter(b, a, data_array, zi)
     return out.reshape(orig_shape)
