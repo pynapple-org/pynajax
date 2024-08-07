@@ -324,25 +324,46 @@ def _get_complement_slicing(idx_start, idx_end, max_len):
     slicing_length = np.sum(idx_end - idx_start)
     complement_indices = np.zeros(max_len - slicing_length, dtype=np.int32)
 
+    num_ix = int(idx_start[0] > 0) + int(idx_end[-1] < max_len) + len(idx_start) - 1
+    ix_start = np.zeros(num_ix, dtype=np.int32)
+    ix_end = np.zeros(num_ix, dtype=np.int32)
+
+    cc_start = 0
+    cc_end = 0
+
     # Add indices before the first start index
     if len(idx_start) and idx_start[0] > 0:
+
+        ix_start[cc_start] = 0
+        cc_start += 1
         for k in range(0, idx_start[0]):
             complement_indices[complement_cnt] = k
             complement_cnt += 1
 
+        ix_end[cc_end] = k + 1
+        cc_end += 1
+
     # Add indices between each end and the next start
     for i in range(len(idx_start) - 1):
         if idx_end[i] < idx_start[i + 1]:
+            ix_start[cc_start] = idx_end[i]
+            cc_start += 1
             for k in range(idx_end[i], idx_start[i + 1]):
                 complement_indices[complement_cnt] = k
                 complement_cnt += 1
+            ix_end[cc_end] = k + 1
+            cc_end += 1
 
     # Add indices after the last end index
     if len(idx_end) > 0 and idx_end[-1] < max_len:
+        ix_start[cc_start] = idx_end[-1]
+
         for k in range(idx_end[-1], max_len):
             complement_indices[complement_cnt] = k
             complement_cnt += 1
-    return complement_indices
+        ix_end[cc_end] = k + 1
+
+    return complement_indices, ix_start, ix_end
 
 
 @jit(nopython=True)
@@ -427,9 +448,14 @@ def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
 
     Returns
     -------
-    :
+    ext :
         Odd extended array (flip borders and decrement of the same step).
         Must ensure that n_pts is greater than each epoch point
+    ix_pad_start :
+        Start indices for padding.
+    ix_pad_end :
+        End indices for padding.
+
     Raises
     ------
     ValueError:
@@ -450,7 +476,7 @@ def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
             ),
             axis=0
         )
-
+        ix_pad_start, idx_pad_end = jnp.array([0]), jnp.array([len(ext)])
     else:
         # check epoch duration
         idx_start = np.searchsorted(time, starts)
@@ -482,9 +508,9 @@ def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
             idx_start, idx_end, 2*n_pts, start_from=n_pts
         )
         ix_data = _get_slicing(idx_start_shift, idx_end_shift)
-        ix_padding = _get_complement_slicing(idx_start_shift, idx_end_shift, new_size)
+        ix_padding, ix_pad_start, idx_pad_end = _get_complement_slicing(idx_start_shift, idx_end_shift, new_size)
 
         # instantiate new array
         ext = jnp.zeros((new_size, *data.shape[1:])).at[ix_data].set(data).at[ix_padding].set(edges)
 
-    return ext, idx_start_shift, idx_end_shift
+    return ext, ix_pad_start, idx_pad_end

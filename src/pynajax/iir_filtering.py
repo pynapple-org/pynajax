@@ -104,19 +104,16 @@ def _insert_constant(time_array, data_array, starts, ends, window_size, const=jn
     return data_array, ix_orig, ix_shift, idx_start_shift, idx_end_shift
 
 
-def _compute_initial_cond(num_pts, idx_start_shift, zi):
+def _compute_initial_cond(data_shape, idx_start, zi):
     # set zis with broadcasting tricks
-    zi_idxs = (
-            idx_start_shift[:, jnp.newaxis] +
-            jnp.ones((len(idx_start_shift), 1), dtype=int) * jnp.arange(len(zi))[jnp.newaxis]
+    zi_idx = (
+            idx_start[:, jnp.newaxis] +
+            jnp.ones((len(idx_start), 1), dtype=int) * jnp.arange(len(zi))[jnp.newaxis]
     ).flatten()
 
-    # set the zis at the start of each epoch
-    if zi.ndim == 1:
-        zi = jnp.tile(zi, len(idx_start_shift))
-    else:
-        zi = zi.reshape(-1, )
-    zi_big = jnp.zeros(num_pts).at[zi_idxs].set(zi)
+    # assume that zi.shape[0] == zi_idx.shape[0]
+    # assume that zi.shape[1] == data_shape[1]
+    zi_big = jnp.zeros(data_shape).at[zi_idx].set(zi)
     return zi_big
 
 
@@ -181,49 +178,47 @@ def lfilter(b, a, time_array, data_array, starts, ends, zi=None):
     data_array = data_array.reshape(data_array.shape[0], -1)
 
     if zi is None:
-        zi = jnp.zeros((len(a) - 1, ))
+        zi = jnp.zeros_like(data_array)
+    elif len(zi) == len(a) - 1:
+        zi = jnp.zeros(data_array.shape).at[:len(zi)].set(zi)
+
+    # normalize
+    b /= a[0]
+    a /= a[0]
 
     if len(starts) > 1:
-        # normalize
-        b /= a[0]
-        a /= a[0]
-
-
-
         agu_data, ix_orig, ix_shift, idx_start_shift, idx_end_shift = _insert_constant(
             time_array, data_array, starts, ends, len(b) - 1, const=0.0
         )
-        # interleave with 0
-        zi_big = _compute_initial_cond(len(agu_data), idx_start_shift, zi)
-        out = _iir_filter_multi(b, a, agu_data, zi_big, ix_orig, ix_shift, data_array.shape, orig_shape)
+        out = _iir_filter_multi(b, a, agu_data, zi, ix_orig, ix_shift, data_array.shape, orig_shape)
     else:
-        idx_start = np.searchsorted(time_array, starts[0])
-        idx_end = np.searchsorted(time_array, ends[0], side="right")
-        out = _iir_filter_single(b, a, data_array[idx_start: idx_end], zi, orig_shape)
+        out = _iir_filter_single(b, a, data_array, zi, orig_shape)
     return out
+
 
 
 # TODO> return the starts and ends of the padded indices.
 # TODO> appropriately create (zi.shape[0], num_epochs, *data.shape[1:]) array to be used as initial condition
 # TODO> generalize the z_big creating function, adding the appropriate zis at the right sample.
 #       strategy: do it for one signal (this is what we have), vmap to multi-signal, use static args.
-# def filtfilt(b, a, time_array, data_array, starts, ends):
-#
-#     # equivalent to scipy.filtfilt default ("pad" method and "odd" padtype).
-#     pad_num = 3 * max(len(a), len(b))
-#
-#     ext, idx_start_shift, idx_end_shift = _odd_ext_multiepoch(pad_num, time_array, data_array, starts, ends)
-#
-#     zi = lfilter_zi(b, a)
-#     zi_shape = [1] + [1] * data_array.ndim
-#     zi_shape[0] = zi.size
-#     zi = np.reshape(zi, zi_shape)
-#
-#     # create z_big: size is ext.shape, has the correct zi per each epoch
-#
-#     # scorporate the computation of zi_big here.
-#
-#     out = lfilter(b, a, time_array, data_array, starts, ends, zi=zi*ext[0])
-#     irev = _revert_epochs(time_array, starts, ends)
-#     out = lfilter(b, a, time_array, out[irev], starts, ends, zi=zi*out[-1])[irev]  # multiply zi by the start out
-#     return out
+def filtfilt(b, a, time_array, data_array, starts, ends):
+
+    # equivalent to scipy.filtfilt default ("pad" method and "odd" padtype).
+    pad_num = 3 * max(len(a), len(b))
+
+    ext, ix_start_pad, ix_end_pad = _odd_ext_multiepoch(pad_num, time_array, data_array, starts, ends)
+
+    # get initial delays
+    zi = lfilter_zi(b, a)
+    zi = zi.reshape([zi.shape[0]] + [1] * (data_array.ndim - 1))
+
+    # compute initial delays (n_starts, len(zi), *data_array[1:]) and reshape to (n_starts * len(zi), *data_array[1:])
+    out0 = zi * ext[ix_start_pad, jnp.newaxis]
+    out0 = out0.reshape(-1, *out0.shape[2:])
+    out0 = _compute_initial_cond(ext.shape, idx_start=ix_start_pad, zi=out0)
+    # forward pass filter
+    out = lfilter(b, a, time_array, ext, starts, ends, zi=out0)
+    # backward pass
+    irev = _revert_epochs(time_array, starts, ends)
+    out = lfilter(b, a, time_array, out[irev], starts, ends, zi=zi*out[-1])[irev]  # multiply zi by the start out
+    return out
