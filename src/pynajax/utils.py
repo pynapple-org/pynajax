@@ -234,7 +234,7 @@ def _fill_forward(
     return filled_d
 
 
-def _get_shifted_indices(idx_start, idx_end, window):
+def _get_shifted_indices(idx_start, idx_end, window, start_from=0):
     """
     Compute shifted indices for given start and end indices based on a specified window size.
 
@@ -252,7 +252,7 @@ def _get_shifted_indices(idx_start, idx_end, window):
     : tuple of ArrayLike
         A tuple containing two arrays: shifted start indices and shifted end indices.
     """
-    cum_delta = np.concatenate([[0], np.cumsum(idx_end - idx_start)])
+    cum_delta = np.concatenate([[start_from], start_from + np.cumsum(idx_end - idx_start)])
     idx_start_shift = window * np.arange(idx_start.shape[0]) + cum_delta[:-1]
     idx_end_shift = window * np.arange(idx_end.shape[0]) + cum_delta[1:]
     return idx_start_shift, idx_end_shift
@@ -283,6 +283,66 @@ def _get_slicing(idx_start, idx_end):
             ix[cnt] = k
             cnt += 1
     return ix
+
+
+def _get_complement_slicing(idx_start, idx_end, max_len):
+    """
+    Generate an array of indices that are not included in the specified slices, based on provided start and end indices.
+
+    Parameters
+    ----------
+    idx_start : ndarray
+        An array of start indices for slicing.
+    idx_end : ndarray
+        An array of end indices for slicing. Each end index corresponds to a start index.
+    max_len : int
+        The maximum index to consider (i.e., the length of the array).
+
+    Returns
+    -------
+    ndarray
+        An array of complementary indices that are not covered by the slices defined by `idx_start` and `idx_end`.
+
+    Notes
+    -----
+    The function computes the indices that fall outside the ranges defined by the start and end indices.
+    The result includes:
+    1. Indices before the first start index.
+    2. Indices between each end index and the subsequent start index.
+    3. Indices after the last end index up to `max_len`.
+
+    Examples
+    --------
+    >>> idx_start = np.array([2, 5, 8])
+    >>> idx_end = np.array([4, 6, 10])
+    >>> max_len = 12
+    >>> _get_complement_slicing(idx_start, idx_end, max_len)
+    array([0, 1, 4, 7, 11])
+    """
+    # Collect complementary indices
+    complement_cnt = 0
+    slicing_length = np.sum(idx_end - idx_start)
+    complement_indices = np.zeros(max_len - slicing_length, dtype=np.int32)
+
+    # Add indices before the first start index
+    if len(idx_start) and idx_start[0] > 0:
+        for k in range(0, idx_start[0]):
+            complement_indices[complement_cnt] = k
+            complement_cnt += 1
+
+    # Add indices between each end and the next start
+    for i in range(len(idx_start) - 1):
+        if idx_end[i] < idx_start[i + 1]:
+            for k in range(idx_end[i], idx_start[i + 1]):
+                complement_indices[complement_cnt] = k
+                complement_cnt += 1
+
+    # Add indices after the last end index
+    if len(idx_end) > 0 and idx_end[-1] < max_len:
+        for k in range(idx_end[-1], max_len):
+            complement_indices[complement_cnt] = k
+            complement_cnt += 1
+    return complement_indices
 
 
 @jit(nopython=True)
@@ -352,3 +412,79 @@ def pad_and_roll(count_array, windows, constant_value=np.nan):
     idx = jnp.arange(windows[0], n_samples + windows[0])
     roll = jax.vmap(lambda i: jnp.roll(pad(count_array), -i, axis=0))
     return roll(indices)[:, idx]
+
+
+def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
+    """
+    Odd extension at the boundaries of an array using JAX on first axis.
+
+    Parameters
+    ----------
+    x : jnp.ndarray
+        The array to be extended, any shape.
+    n : int
+        The number of elements by which to extend `x` at each end of the axis.
+
+    Returns
+    -------
+    :
+        Odd extended array (flip borders and decrement of the same step).
+        Must ensure that n_pts is greater than each epoch point
+    Raises
+    ------
+    ValueError:
+        If not enough samples for padding.
+    """
+    if len(starts) <= 1:
+
+        if data.shape[0] < n_pts:
+            raise ValueError("The length of the data per each epoch must be greater "
+                             f"than `{n_pts}`, which is required by the padding used "
+                             "in this algorithm.")
+
+        ext = jnp.concatenate(
+            (
+                2 * data[0] - data[slice(n_pts, 0, -1)],
+                data,
+                2 * data[-1] - data[slice(-2, -(n_pts + 2), -1)]
+            ),
+            axis=0
+        )
+
+    else:
+        # check epoch duration
+        idx_start = np.searchsorted(time, starts)
+        idx_end = np.searchsorted(time, ends, side="right")
+
+        if np.any(idx_end - idx_start < n_pts):
+            raise ValueError("The length of the data per each epoch must be greater "
+                             f"than `{n_pts}`, which is required by the padding used "
+                             "in this algorithm.")
+        # use slower slicing with indices with multi-epochs
+        # use broadcasting trick
+        i_after_start = idx_start[:, jnp.newaxis] + jnp.ones((len(idx_start), 1), dtype=int) * jnp.arange(n_pts, 0, -1)[jnp.newaxis]
+        i_before_end = idx_end[:, jnp.newaxis] - jnp.ones((len(idx_start), 1), dtype=int) * jnp.arange(2, n_pts + 2)[jnp.newaxis]
+
+        # calculate edges as the above, more readable formula and store it
+        # uses broadcasting
+        edges = np.hstack(
+            (
+                2 * data[idx_start, jnp.newaxis] - data[i_after_start],
+                2 * data[idx_end-1, jnp.newaxis] - data[i_before_end])
+        ).reshape(-1, *data.shape[1:])
+
+        # count how many time points the padded array has
+        new_size = data.shape[0] + edges.shape[0]
+
+        # get the indices for setting elements
+        # shift by a window every epoch
+        idx_start_shift, idx_end_shift = _get_shifted_indices(
+            idx_start, idx_end, 2*n_pts, start_from=n_pts
+        )
+        ix_data = _get_slicing(idx_start_shift, idx_end_shift)
+        ix_padding = _get_complement_slicing(idx_start_shift, idx_end_shift, new_size)
+
+        # instantiate new array
+        ext = jnp.zeros((new_size, *data.shape[1:])).at[ix_data].set(data).at[ix_padding].set(edges)
+
+    return ext, idx_start_shift, idx_end_shift
