@@ -367,7 +367,7 @@ def _get_complement_slicing(idx_start, idx_end, max_len):
 
 
 @jit(nopython=True)
-def _revert_epochs(time_array, starts, ends):
+def _revert_epochs(idx_start, idx_end):
     """
     Generate an array of indices for reversing data order within each epoch.
 
@@ -385,7 +385,7 @@ def _revert_epochs(time_array, starts, ends):
     : ArrayLike
         An array of indices constructed from the start and end indices.
     """
-    idx_start, idx_end = _get_idxs(time_array, starts, ends)
+
     iend = np.sum(idx_end - idx_start)
     ix = np.zeros(iend, dtype=np.int32)
     cnt = 0
