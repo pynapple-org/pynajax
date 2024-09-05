@@ -187,6 +187,7 @@ def _lfilter(b, a, data, zi_big, orig_shape, iir_ab_recursion):
     a /= a[0]
     return iir_ab_recursion(b, a, data, zi_big, orig_shape)
 
+
 def lfilter(b, a, time_array, data_array, starts, ends, zi=None):
     """
     Filter the data for multiple epochs.
@@ -237,7 +238,7 @@ def lfilter(b, a, time_array, data_array, starts, ends, zi=None):
 
 
 
-# TODO> remove padding
+# TODO> remove padding.
 def filtfilt(b, a, time_array, data_array, starts, ends):
     orig_shape = data_array.shape
 
@@ -298,8 +299,7 @@ def filtfilt(b, a, time_array, data_array, starts, ends):
 
     # backward pass & re-sort
     out = _lfilter(b, a, agu_data, out0.flatten(), ext.shape, _iir_recursion)[irev]
-
     # remove padding
-
     # reshape and return
+    # save.
     return out
