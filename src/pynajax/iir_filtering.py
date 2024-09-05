@@ -67,7 +67,6 @@ def _recursion_loop_sos(signal, sos, zi):
         x_cur = x_new
         return x_cur, zi_slice
 
-
     def recursion_step(carry, x):
         x_cur, zi_slice = jax.lax.fori_loop(lower=0, upper=sos.shape[0], body_fun=internal_loop, init_val=(x, carry))
         return zi_slice, x_cur
@@ -75,6 +74,7 @@ def _recursion_loop_sos(signal, sos, zi):
     _, res = jax.lax.scan(recursion_step, zi, signal)
 
     return res
+
 
 # vectorize the recursion over signals.
 _vmap_recursion_ab = jax.vmap(_recursion_loop_ab, in_axes=(1, None, None), out_axes=1)
@@ -149,7 +149,7 @@ def _expand_initial_condition(data_shape, idx_start, zi, zi_len):
     ).flatten()
 
     # assume zi is the output of scipy.signal.lfilter_zi
-    zi_big = jnp.zeros(data_shape).at[zi_idx].set(zi.reshape(-1, 1)).reshape(-1)
+    zi_big = jnp.zeros(data_shape).at[zi_idx].set(zi)
     return zi_big
 
 
@@ -232,7 +232,7 @@ def lfilter(b, a, time_array, data_array, starts, ends, zi=None):
         _iir_recursion = lambda x, y, d, z, s: _iir_filter_multi(x, y, d, z, ix_orig, ix_shift, data_array.shape, s)
 
     zi = jnp.tile(zi, len(idx_start_shift))
-    zi_big = _expand_initial_condition(agu_data.shape, idx_start_shift, zi, len(a) - 1)
+    zi_big = _expand_initial_condition(agu_data.shape[0], idx_start_shift, zi, len(a) - 1)
     out = _lfilter(b, a, agu_data, zi_big, orig_shape, _iir_recursion)
     return out
 
