@@ -5,8 +5,12 @@ import jax.numpy as jnp
 import numpy as np
 import scipy.signal as signal
 
-from .utils import (_get_idxs, _get_shifted_indices, _get_slicing,
-                    _odd_ext_multiepoch, _revert_epochs)
+from .utils import (
+    _get_shifted_indices,
+    _get_slicing,
+    _odd_ext_multiepoch,
+    _revert_epochs,
+)
 
 
 @partial(jax.jit, static_argnums=(3, ))
