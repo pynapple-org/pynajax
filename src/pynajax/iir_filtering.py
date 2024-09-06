@@ -120,62 +120,6 @@ def _insert_constant(idx_start, idx_end, data_array, window_size, const=jnp.nan)
     return data_array, ix_orig, ix_shift, idx_start_shift, idx_end_shift
 
 
-def sosfilter(sos, time_array, data_array, starts, ends, zi=None):
-    """
-    Apply a second-order section (SOS) filter to the data over multiple epochs.
-
-    This function filters the data array using the given SOS filter coefficients over specified time epochs.
-    It handles cases with or without specified initial conditions and NaN handling.
-
-    Parameters
-    ----------
-    sos : jnp.ndarray
-        Array of second-order filter coefficients in the 'sos' format, with shape (n_sections, 6).
-    time_array : jnp.ndarray
-        The time array corresponding to the data, with shape (n_samples,).
-    data_array : jnp.ndarray
-        The data array to be filtered, with shape (n_samples, ...).
-    starts : jnp.ndarray
-        Array of start indices for the epochs in the data array.
-    ends : jnp.ndarray
-        Array of end indices for the epochs in the data array.
-    zi : jnp.ndarray, optional
-        Initial conditions for the filter. If None, the filter will start with zeros. By default None.
-    nan_func : callable, optional
-        Function to handle NaN values during filtering. If None, a default function will be used. By default None.
-
-    Returns
-    -------
-    : jnp.ndarray
-        The filtered data array, with the same shape as the input data array.
-    """
-    orig_shape = data_array.shape
-    data_array = data_array.reshape(data_array.shape[0], -1)
-
-    if zi is None:
-        x_zi_shape = list(data_array.shape)
-        x_zi_shape[0] = 2
-        x_zi_shape = tuple([sos.shape[0]] + x_zi_shape)
-        zi = jnp.zeros(x_zi_shape)
-
-    if zi.ndim == 3:
-        # add an epoch axes
-        zi = zi[..., jnp.newaxis]
-
-    nan_func = lambda i, x: (i+1, x[..., 0])
-
-    if len(starts) == 1:
-        return _vmap_recursion_sos(data_array, sos, zi, nan_func).reshape(orig_shape)
-
-    else:
-        agu_data, ix_orig, ix_shift, idx_start_shift, idx_end_shift = _insert_constant(
-            *_get_idxs(time_array, starts, ends), data_array, 1, const=np.nan
-        )
-        out = _vmap_recursion_sos(agu_data, sos, zi, nan_func)
-        out = jnp.zeros(orig_shape).at[ix_orig].set(out[ix_shift]).reshape(orig_shape)
-    return out
-
-
 def sosfiltfilt(sos, time_array, data_array, starts, ends):
     """
     Apply forward-backward filtering using a second-order section (SOS) filter.
@@ -200,7 +144,18 @@ def sosfiltfilt(sos, time_array, data_array, starts, ends):
     -------
     : jnp.ndarray
         The zero-phase filtered data array, with the same shape as the input data array.
+    Raises
+    ------
+        ValueError:
+            If any NaNs are found in the original dataframe.
     """
+
+    if jnp.any(jnp.isnan(data_array)):
+        raise ValueError("Cannot apply filter in the presence of NaNs. Drop NaNs first. "
+                         "You can use the `tsd.dropna()` method.")
+
+    original_shape = data_array.shape
+    data_array = data_array.reshape(data_array.shape[0], -1)
 
     # same default padding as scipy.sosfiltfilt ("pad" method and "odd" padtype).
     n_sections = sos.shape[0]
@@ -255,4 +210,4 @@ def sosfiltfilt(sos, time_array, data_array, starts, ends):
     # remove nans and padding
     out = out[ix_shift][ix_data]
 
-    return out
+    return out.reshape(original_shape)
