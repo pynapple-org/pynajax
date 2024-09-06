@@ -373,12 +373,10 @@ def _revert_epochs(idx_start, idx_end):
 
     Parameters
     ----------
-    time_array : array_like
-        The sorted array of timestamps.
-    starts : array_like
-        An array of start times for which indices are required in `time_array`.
-    ends : array_like
-        An array of end times for which indices are required in `time_array`.
+    idx_start: NDArray
+        Start epoch indices.
+    idx_end: NDArray
+        End epoch indices.
 
     Returns
     -------
@@ -437,29 +435,58 @@ def pad_and_roll(count_array, windows, constant_value=np.nan):
 
 def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
     """
-    Odd extension at the boundaries of an array using JAX on first axis.
+    Apply an odd extension at the boundaries of a multi-epoch data array using JAX.
+
+    This function extends the data array at both ends using an odd extension (i.e., mirroring the border values
+    with a decrement of the same step). It supports both single and multiple epochs.
 
     Parameters
     ----------
-    x : jnp.ndarray
-        The array to be extended, any shape.
-    n : int
-        The number of elements by which to extend `x` at each end of the axis.
+    n_pts : int
+        The number of points by which to extend the data at each end of the array for each epoch.
+    time : jnp.ndarray
+        The time array corresponding to the data, used to determine the start and end indices for each epoch.
+    data : jnp.ndarray
+        The input data array to be extended, with shape (n_samples, ...).
+    starts : jnp.ndarray
+        Array of start times for each epoch.
+    ends : jnp.ndarray
+        Array of end times for each epoch.
 
     Returns
     -------
-    ext :
-        Odd extended array (flip borders and decrement of the same step).
-        Must ensure that n_pts is greater than each epoch point
-    ix_pad_start :
-        Start indices for padding.
-    ix_pad_end :
-        End indices for padding.
+    ext : jnp.ndarray
+        The extended data array with odd extensions at the boundaries. The shape will be larger than the input
+        data array due to the added padding.
+    ix_pad_start : jnp.ndarray
+        Array of start indices for the padding regions.
+    ix_pad_end : jnp.ndarray
+        Array of end indices for the padding regions.
+    ix_data : jnp.ndarray
+        Array of indices corresponding to the original data positions within the extended array.
 
     Raises
     ------
-    ValueError:
-        If not enough samples for padding.
+    ValueError
+        If the length of the data per each epoch is not sufficient to perform the required padding.
+
+    Examples
+    --------
+    >>> n_pts = 3
+    >>> time = jnp.array([0, 1, 2, 3, 4, 5, 6])
+    >>> data = jnp.array([10, 20, 30, 40, 50, 60, 70])
+    >>> starts = jnp.array([1])
+    >>> ends = jnp.array([5])
+    >>> ext, ix_pad_start, ix_pad_end, ix_data = _odd_ext_multiepoch(n_pts, time, data, starts, ends)
+    >>> print(ext)
+    # Output: Extended array with odd extensions at the boundaries
+
+    Notes
+    -----
+    The function supports both single and multi-epoch data. For single epochs, it performs a simple odd extension
+    at the boundaries. For multi-epoch data, it slices the data into epochs, applies odd extension to each epoch,
+    and then reconstructs the extended array. The function ensures that `n_pts` is smaller than the length of
+    the data for each epoch.
     """
     if len(starts) <= 1:
 
@@ -477,6 +504,7 @@ def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
             axis=0
         )
         ix_pad_start, idx_pad_end = jnp.array([0]), jnp.array([len(ext)])
+        ix_data = jnp.arange(n_pts, data.shape[0] + n_pts)
     else:
         # check epoch duration
         idx_start = np.searchsorted(time, starts)
@@ -513,4 +541,4 @@ def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
         # instantiate new array
         ext = jnp.zeros((new_size, *data.shape[1:])).at[ix_data].set(data).at[ix_padding].set(edges)
 
-    return ext, ix_pad_start, idx_pad_end
+    return ext, ix_pad_start, idx_pad_end, ix_data
