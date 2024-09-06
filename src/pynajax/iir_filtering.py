@@ -202,7 +202,7 @@ def sosfiltfilt(sos, time_array, data_array, starts, ends):
         The zero-phase filtered data array, with the same shape as the input data array.
     """
 
-    # same default padding as scipy.sosfiltfilt default ("pad" method and "odd" padtype).
+    # same default padding as scipy.sosfiltfilt ("pad" method and "odd" padtype).
     n_sections = sos.shape[0]
     ntaps = 2 * n_sections + 1
     ntaps -= min((sos[:, 2] == 0).sum(), (sos[:, 5] == 0).sum())
