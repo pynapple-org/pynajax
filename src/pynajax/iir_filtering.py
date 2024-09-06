@@ -144,15 +144,7 @@ def sosfiltfilt(sos, time_array, data_array, starts, ends):
     -------
     : jnp.ndarray
         The zero-phase filtered data array, with the same shape as the input data array.
-    Raises
-    ------
-        ValueError:
-            If any NaNs are found in the original dataframe.
     """
-
-    if jnp.any(jnp.isnan(data_array)):
-        raise ValueError("Cannot apply filter in the presence of NaNs. Drop NaNs first. "
-                         "You can use the `tsd.dropna()` method.")
 
     original_shape = data_array.shape
     data_array = data_array.reshape(data_array.shape[0], -1)
