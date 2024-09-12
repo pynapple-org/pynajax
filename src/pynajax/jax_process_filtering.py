@@ -25,7 +25,7 @@ def _recursion_loop_sos(signal, sos, zi, nan_function):
     sos : jnp.ndarray
         Array of second-order filter coefficients in the 'sos' format, with shape (n_sections, 6).
     zi : jnp.ndarray
-        Initial conditions for the filter, with shape (n_sections, 2).
+        Initial conditions for the filter, with shape (n_sections, 2, n_epochs).
     nan_function : callable
         A function that specifies how to re-initialize the initial conditions when a NaN is encountered in the signal.
         It should take two arguments: the epoch number and the current filter state, and return a tuple of the updated
@@ -43,7 +43,8 @@ def _recursion_loop_sos(signal, sos, zi, nan_function):
         zi_slice = zi_slice.at[s, 0].set(
             sos[s, 1] * x_cur - sos[s, 4] * x_new + zi_slice[s, 1]
         )
-        zi_slice = zi_slice.at[s, 1].set(sos[s, 2] * x_cur - sos[s, 5] * x_new)
+        zi_slice = zi_slice.at[s, 1].set(
+            sos[s, 2] * x_cur - sos[s, 5] * x_new)
         x_cur = x_new
         return x_cur, zi_slice
 
@@ -124,7 +125,7 @@ def _insert_constant(idx_start, idx_end, data_array, window_size, const=jnp.nan)
     return data_array, ix_orig, ix_shift, idx_start_shift, idx_end_shift
 
 
-def sosfiltfilt(sos, time_array, data_array, starts, ends):
+def jax_sosfiltfilt(sos, time_array, data_array, starts, ends):
     """
     Apply forward-backward filtering using a second-order section (SOS) filter.
 
@@ -133,15 +134,15 @@ def sosfiltfilt(sos, time_array, data_array, starts, ends):
 
     Parameters
     ----------
-    sos : jnp.ndarray
+    sos : np.ndarray
         Array of second-order filter coefficients in the 'sos' format, with shape (n_sections, 6).
-    time_array : jnp.ndarray
+    time_array : np.ndarray
         The time array corresponding to the data, with shape (n_samples,).
     data_array : jnp.ndarray
         The data array to be filtered, with shape (n_samples, ...).
-    starts : jnp.ndarray
+    starts : np.ndarray
         Array of start indices for the epochs in the data array.
-    ends : jnp.ndarray
+    ends : np.ndarray
         Array of end indices for the epochs in the data array.
 
     Returns
@@ -171,24 +172,24 @@ def sosfiltfilt(sos, time_array, data_array, starts, ends):
     z0 = zi[..., jnp.newaxis, jnp.newaxis] * ext.T[jnp.newaxis, jnp.newaxis, ..., ix_start_ep]
 
     if len(starts) > 1:
-        # multi epoch case agumenting with nans.
-        agu_data, ix_orig, ix_shift, idx_start_shift, idx_end_shift = _insert_constant(
-            ix_start_ep, ix_end_ep, ext, 1, const=np.nan
+        # multi epoch case augmenting with nans.
+        aug_data, ix_orig, ix_shift, idx_start_shift, idx_end_shift = _insert_constant(
+            ix_start_ep, ix_end_ep, ext, window_size=1, const=np.nan
         )
 
         # grab the next initial condition, increase the epoch counter
         nan_func = lambda ep_num, x: (ep_num + 1, x[..., ep_num + 1])
     else:
-        # single epoch, no agumentation
+        # single epoch, no augmentation
         nan_func = lambda ep_num, x: (ep_num + 1, x[..., 0])
-        agu_data = ext
+        aug_data = ext
         idx_start_shift = ix_start_ep
         idx_end_shift = ix_end_ep
         ix_shift = slice(None)
 
 
     # call forward recursion
-    out = _vmap_recursion_sos(agu_data, sos, z0, nan_func)
+    out = _vmap_recursion_sos(aug_data, sos, z0, nan_func)
 
     # reverse time axis
     irev = _revert_epochs(idx_start_shift, idx_end_shift)
