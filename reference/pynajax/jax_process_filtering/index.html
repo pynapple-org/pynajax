@@ -9,10 +9,10 @@
       
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../jax_core_threshold/">
       
       
-        <link rel="next" href="../jax_core_convolve/">
+        <link rel="next" href="../jax_process_perievent/">
       
       
       <link rel="icon" href="../../../assets/images/favicon.png">
@@ -20,7 +20,7 @@
     
     
       
-        <title>Jax core bin average - pynajax</title>
+        <title>Jax process filtering - pynajax</title>
       
     
     
@@ -82,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#pynajax.jax_core_bin_average" class="md-skip">
+        <a href="#pynajax.jax_process_filtering" class="md-skip">
           Skip to content
         </a>
       
@@ -118,7 +118,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Jax core bin average
+              Jax process filtering
             
           </span>
         </div>
@@ -535,28 +535,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    Jax core bin average
-  </span>
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../jax_core_bin_average/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -565,42 +547,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#pynajax.jax_core_bin_average" class="md-nav__link">
-    <span class="md-ellipsis">
-      jax_core_bin_average
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pynajax.jax_core_bin_average.bin_average" class="md-nav__link">
-    <span class="md-ellipsis">
-      bin_average
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -652,10 +598,28 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../jax_process_filtering/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Jax process filtering
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -664,6 +628,42 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pynajax.jax_process_filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      jax_process_filtering
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pynajax.jax_process_filtering.jax_sosfiltfilt" class="md-nav__link">
+    <span class="md-ellipsis">
+      jax_sosfiltfilt
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -751,18 +751,18 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core_bin_average" class="md-nav__link">
+  <a href="#pynajax.jax_process_filtering" class="md-nav__link">
     <span class="md-ellipsis">
-      jax_core_bin_average
+      jax_process_filtering
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#pynajax.jax_core_bin_average.bin_average" class="md-nav__link">
+  <a href="#pynajax.jax_process_filtering.jax_sosfiltfilt" class="md-nav__link">
     <span class="md-ellipsis">
-      bin_average
+      jax_sosfiltfilt
     </span>
   </a>
   
@@ -786,13 +786,13 @@
   
 
 
-  <h1>Jax core bin average</h1>
+  <h1>Jax process filtering</h1>
 
 <div class="doc doc-object doc-module">
 
 
 
-<a id="pynajax.jax_core_bin_average"></a>
+<a id="pynajax.jax_process_filtering"></a>
     <div class="doc doc-contents first">
 
 
@@ -810,15 +810,17 @@
 <div class="doc doc-object doc-function">
 
 
-<h2 id="pynajax.jax_core_bin_average.bin_average" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">bin_average</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">binsize</span><span class="p">)</span></code>
+<h2 id="pynajax.jax_process_filtering.jax_sosfiltfilt" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">jax_sosfiltfilt</span><span class="p">(</span><span class="n">sos</span><span class="p">,</span> <span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)</span></code>
 
 </h2>
 
 
     <div class="doc doc-contents ">
 
-      <p>Perform bin-averaging of data array based on time array within specified epochs.</p>
+      <p>Apply forward-backward filtering using a second-order section (SOS) filter.</p>
+<p>This function applies an SOS filter to the data array in both forward and reverse directions,
+which results in zero-phase filtering.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -833,13 +835,27 @@
       </thead>
       <tbody>
           <tr class="doc-section-item">
+            <td><code>sos</code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Array of second-order filter coefficients in the 'sos' format, with shape (n_sections, 6).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
             <td><code>time_array</code></td>
             <td>
                   <code><span title="numpy.ndarray">ndarray</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Array of time points.</p>
+                <p>The time array corresponding to the data, with shape (n_samples,).</p>
               </div>
             </td>
             <td>
@@ -853,7 +869,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Multidimensional data array to be averaged, where the first dimension matches time_array.</p>
+                <p>The data array to be filtered, with shape (n_samples, ...).</p>
               </div>
             </td>
             <td>
@@ -867,7 +883,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Start times of the epochs.</p>
+                <p>Array of start indices for the epochs in the data array.</p>
               </div>
             </td>
             <td>
@@ -881,21 +897,7 @@
             </td>
             <td>
               <div class="doc-md-description">
-                <p>End times of the epochs.</p>
-              </div>
-            </td>
-            <td>
-                <em>required</em>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td><code>binsize</code></td>
-            <td>
-                  <code>float</code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>Size of each bin.</p>
+                <p>Array of end indices for the epochs in the data array.</p>
               </div>
             </td>
             <td>
@@ -910,28 +912,18 @@
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>time_array_new</code></td>            <td>
+            <td>
                   <code><span title="jax.numpy.ndarray">ndarray</span></code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>New time array corresponding to the bin centers.</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-<td><code>data_array_new</code></td>            <td>
-                  <code><span title="jax.numpy.ndarray">ndarray</span></code>
-            </td>
-            <td>
-              <div class="doc-md-description">
-                <p>New data array containing the averaged values.</p>
+                <p>The zero-phase filtered data array, with the same shape as the input data array.</p>
               </div>
             </td>
           </tr>
@@ -939,8 +931,31 @@
     </table>
 
             <details class="quote">
-              <summary>Source code in <code>src/pynajax/jax_core_bin_average.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">151</span>
+              <summary>Source code in <code>src/pynajax/jax_process_filtering.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span>
 <span class="normal">154</span>
@@ -976,43 +991,112 @@
 <span class="normal">184</span>
 <span class="normal">185</span>
 <span class="normal">186</span>
-<span class="normal">187</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">bin_average</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">binsize</span><span class="p">):</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">jax_sosfiltfilt</span><span class="p">(</span><span class="n">sos</span><span class="p">,</span> <span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Perform bin-averaging of data array based on time array within specified epochs.</span>
+<span class="sd">    Apply forward-backward filtering using a second-order section (SOS) filter.</span>
+
+<span class="sd">    This function applies an SOS filter to the data array in both forward and reverse directions,</span>
+<span class="sd">    which results in zero-phase filtering.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    time_array : numpy.ndarray</span>
-<span class="sd">        Array of time points.</span>
-<span class="sd">    data_array : jax.numpy.ndarray</span>
-<span class="sd">        Multidimensional data array to be averaged, where the first dimension matches time_array.</span>
-<span class="sd">    starts : numpy.ndarray</span>
-<span class="sd">        Start times of the epochs.</span>
-<span class="sd">    ends : numpy.ndarray</span>
-<span class="sd">        End times of the epochs.</span>
-<span class="sd">    binsize : float</span>
-<span class="sd">        Size of each bin.</span>
+<span class="sd">    sos : np.ndarray</span>
+<span class="sd">        Array of second-order filter coefficients in the &#39;sos&#39; format, with shape (n_sections, 6).</span>
+<span class="sd">    time_array : np.ndarray</span>
+<span class="sd">        The time array corresponding to the data, with shape (n_samples,).</span>
+<span class="sd">    data_array : jnp.ndarray</span>
+<span class="sd">        The data array to be filtered, with shape (n_samples, ...).</span>
+<span class="sd">    starts : np.ndarray</span>
+<span class="sd">        Array of start indices for the epochs in the data array.</span>
+<span class="sd">    ends : np.ndarray</span>
+<span class="sd">        Array of end indices for the epochs in the data array.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    time_array_new : jax.numpy.ndarray</span>
-<span class="sd">        New time array corresponding to the bin centers.</span>
-<span class="sd">    data_array_new : jax.numpy.ndarray</span>
-<span class="sd">        New data array containing the averaged values.</span>
+<span class="sd">    : jnp.ndarray</span>
+<span class="sd">        The zero-phase filtered data array, with the same shape as the input data array.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data_array</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-        <span class="n">data_array</span> <span class="o">=</span> <span class="n">jnp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data_array</span><span class="p">)</span>
 
-    <span class="c1"># Calculate bin edges and identify time points within epochs for averaging.</span>
-    <span class="n">ix</span><span class="p">,</span> <span class="n">edges</span><span class="p">,</span> <span class="n">in_epoch</span> <span class="o">=</span> <span class="n">_get_bin_edges</span><span class="p">(</span><span class="n">time_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">,</span> <span class="n">binsize</span><span class="o">=</span><span class="n">binsize</span><span class="p">)</span>
+    <span class="n">original_shape</span> <span class="o">=</span> <span class="n">data_array</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">data_array</span> <span class="o">=</span> <span class="n">data_array</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 
-    <span class="c1"># Digitize time points to find corresponding bins, adjusting indices to be 0-based.</span>
-    <span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">digitize</span><span class="p">(</span><span class="n">time_array</span><span class="p">[</span><span class="n">ix</span><span class="p">],</span> <span class="n">edges</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
-    <span class="n">average</span> <span class="o">=</span> <span class="n">jit_average</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> <span class="n">data_array</span><span class="p">[</span><span class="n">ix</span><span class="p">],</span> <span class="n">edges</span><span class="p">)</span>
+    <span class="c1"># same default padding as scipy.sosfiltfilt (&quot;pad&quot; method and &quot;odd&quot; padtype).</span>
+    <span class="n">n_sections</span> <span class="o">=</span> <span class="n">sos</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">ntaps</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">n_sections</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="n">ntaps</span> <span class="o">-=</span> <span class="nb">min</span><span class="p">((</span><span class="n">sos</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="p">(</span><span class="n">sos</span><span class="p">[:,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+    <span class="n">pad_num</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">ntaps</span>
 
-    <span class="c1"># Create a new time array with bin centers, and filter by in-epoch bins.</span>
-    <span class="n">time_array_new</span> <span class="o">=</span> <span class="n">edges</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">binsize</span> <span class="o">/</span> <span class="mi">2</span>
-    <span class="k">return</span> <span class="n">time_array_new</span><span class="p">[</span><span class="n">in_epoch</span><span class="p">],</span> <span class="n">average</span><span class="p">[</span><span class="n">in_epoch</span><span class="p">]</span>
+    <span class="n">ext</span><span class="p">,</span> <span class="n">ix_start_pad</span><span class="p">,</span> <span class="n">ix_end_pad</span><span class="p">,</span> <span class="n">ix_data</span> <span class="o">=</span> <span class="n">_odd_ext_multiepoch</span><span class="p">(</span><span class="n">pad_num</span><span class="p">,</span> <span class="n">time_array</span><span class="p">,</span> <span class="n">data_array</span><span class="p">,</span> <span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)</span>
+
+    <span class="c1"># get the start/end index of each epoch after padding</span>
+    <span class="n">ix_start_ep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">ix_start_pad</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ix_start_pad</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">pad_num</span><span class="p">))</span>
+    <span class="n">ix_end_ep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">ix_start_ep</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">ix_end_pad</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+
+    <span class="n">zi</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">sosfilt_zi</span><span class="p">(</span><span class="n">sos</span><span class="p">)</span>
+
+    <span class="c1"># this braodcast has shape (*zi.shape, data_array.shape[1], len(ix_start_pad))</span>
+    <span class="n">z0</span> <span class="o">=</span> <span class="n">zi</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">ext</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">ix_start_ep</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">starts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># multi epoch case augmenting with nans.</span>
+        <span class="n">aug_data</span><span class="p">,</span> <span class="n">ix_orig</span><span class="p">,</span> <span class="n">ix_shift</span><span class="p">,</span> <span class="n">idx_start_shift</span><span class="p">,</span> <span class="n">idx_end_shift</span> <span class="o">=</span> <span class="n">_insert_constant</span><span class="p">(</span>
+            <span class="n">ix_start_ep</span><span class="p">,</span> <span class="n">ix_end_ep</span><span class="p">,</span> <span class="n">ext</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+        <span class="p">)</span>
+
+        <span class="c1"># grab the next initial condition, increase the epoch counter</span>
+        <span class="n">nan_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">ep_num</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">ep_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">ep_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># single epoch, no augmentation</span>
+        <span class="n">nan_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">ep_num</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">ep_num</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+        <span class="n">aug_data</span> <span class="o">=</span> <span class="n">ext</span>
+        <span class="n">idx_start_shift</span> <span class="o">=</span> <span class="n">ix_start_ep</span>
+        <span class="n">idx_end_shift</span> <span class="o">=</span> <span class="n">ix_end_ep</span>
+        <span class="n">ix_shift</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+
+
+    <span class="c1"># call forward recursion</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">_vmap_recursion_sos</span><span class="p">(</span><span class="n">aug_data</span><span class="p">,</span> <span class="n">sos</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">nan_func</span><span class="p">)</span>
+
+    <span class="c1"># reverse time axis</span>
+    <span class="n">irev</span> <span class="o">=</span> <span class="n">_revert_epochs</span><span class="p">(</span><span class="n">idx_start_shift</span><span class="p">,</span> <span class="n">idx_end_shift</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">ix_shift</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">irev</span><span class="p">])</span>
+
+    <span class="c1"># compute new init cond</span>
+    <span class="n">z0</span> <span class="o">=</span> <span class="n">zi</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span> <span class="o">*</span> <span class="n">out</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">jnp</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="n">jnp</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="o">...</span><span class="p">,</span> <span class="n">idx_start_shift</span><span class="p">]</span>
+
+    <span class="c1"># call backward recursion</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">_vmap_recursion_sos</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">sos</span><span class="p">,</span> <span class="n">z0</span><span class="p">,</span> <span class="n">nan_func</span><span class="p">)</span>
+
+    <span class="c1"># re-flip axis</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">ix_shift</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="n">irev</span><span class="p">])</span>
+
+    <span class="c1"># remove nans and padding</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">ix_shift</span><span class="p">][</span><span class="n">ix_data</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">out</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">original_shape</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
