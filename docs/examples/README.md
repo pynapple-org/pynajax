@@ -10,3 +10,5 @@ The functions that have been optimized with `pynajax` are :
 - [`threshold`](https://pynapple-org.github.io/pynapple/reference/core/time_series/#pynapple.core.time_series.Tsd.threshold)
 
 - [`event_trigger_average`](https://pynapple-org.github.io/pynapple/reference/process/perievent/#pynapple.process.perievent.compute_event_trigger_average)
+
+- filtering

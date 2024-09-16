@@ -1,7 +1,7 @@
 import numpy as np
-from pynajax.jax_process_perievent import event_trigger_average, pad_and_roll
-from pynajax.utils import _get_idxs
 import pytest
+from pynajax.jax_process_perievent import event_trigger_average
+from pynajax.utils import _get_idxs, pad_and_roll
 
 
 @pytest.mark.parametrize(
@@ -147,14 +147,14 @@ def test_event_trigger_average_multi_ep(counts, stimuli, expected_out):
 def test_event_trigger_average_batch_size(counts, stimuli, expected_out):
     stimuli[2] = 2.0
     expected_out[1] = 2.0
-    
+
     time = np.arange(counts.shape[0])
     windows = (1, 1)
     binsize = 1.
     starts = [0]
     ends = [6]
     out = event_trigger_average(
-        time, counts, time, stimuli, starts, ends, 
+        time, counts, time, stimuli, starts, ends,
         windows, binsize, batch_size=5
         )
     np.testing.assert_array_equal(out, expected_out)
