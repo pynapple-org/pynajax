@@ -14,56 +14,97 @@ import jax
 print(jax.devices())
 
 
-# %% 
-def get_mean_perf_class(obj, kernel):
-    n = 10
+# %%
+def get_mean_perf(tsd, mode, n=10):
     tmp = np.zeros(n)
     for i in range(n):
         t1 = perf_counter()
-        out = obj.convolve(kernel)
+        _ = nap.apply_lowpass_filter(tsd, 0.25 * tsd.rate, mode=mode)
         t2 = perf_counter()
         tmp[i] = t2 - t1
-    return np.mean(tmp), np.std(tmp)
+    return [np.mean(tmp), np.std(tmp)]
 
-def benchmark_filtering(kernel):
+# %%
+
+
+
+def benchmark_time_points(mode):
     times = []
-    for nd in range(10, 500, 50):
-        print("Dimensions ", nd)
-        t = np.arange(10000)
-        d = np.random.randn(10000, nd)
-        tsd = nap.TsdFrame(t=t, d=d)        
-        tsd2 = tsd.convolve(kernel) # First call to compile
-        m, s = get_mean_perf_class(tsd, kernel)
-        times.append([nd, m, s])
+    for T in np.arange(1000, 100000, 20000):
+        time_array = np.arange(T)/1000
+        data_array = np.random.randn(len(time_array))
+        startend = np.linspace(0, time_array[-1], T//100).reshape(T//200, 2)
+        ep = nap.IntervalSet(start=startend[::2,0], end=startend[::2,1])
+        tsd = nap.Tsd(t=time_array, d=data_array, time_support=ep)
+        times.append([T]+get_mean_perf(tsd, mode))
     return np.array(times)
+
+def benchmark_dimensions(mode):
+    times = []
+    for n in np.arange(1, 100, 10):
+        time_array = np.arange(10000)/1000
+        data_array = np.random.randn(len(time_array), n)
+        startend = np.linspace(0, time_array[-1], 10000//100).reshape(10000//200, 2)
+        ep = nap.IntervalSet(start=startend[::2,0], end=startend[::2,1])
+        tsd = nap.TsdFrame(t=time_array, d=data_array, time_support=ep)
+        times.append([n]+get_mean_perf(tsd, mode))
+    return np.array(times)
+
+
+# %%
+# Increasing number of time points
+#
+# Calling with numba/scipy
+times_sinc_numba = benchmark_time_points(mode="sinc")
+times_butter_scipy = benchmark_time_points(mode="butter")
 
 # %%
 # Calling with jax
 nap.nap_config.set_backend("jax")
-jax_times = benchmark_convolve(jnp.ones(11))
 
-# %% 
-# Calling with numba
-nap.nap_config.set_backend("numba")
-num_times = benchmark_convolve(np.ones(11))
+times_sinc_jax = benchmark_time_points(mode="sinc")
+times_butter_jax = benchmark_time_points(mode="butter")
+
+# # %%
+# # Figure
+# plt.figure(figsize = (16, 5))
+# plt.subplot(121)
+# for arr, label in zip(
+#     [times_sinc_numba, times_butter_scipy],
+#     ["Windowed-sinc", "Butter"],
+#     ):
+#     plt.plot(arr[:, 0], arr[:, 1], "o-", label=label)
+#     plt.fill_between(arr[:, 0], arr[:, 1] - arr[:, 2], arr[:, 1] + arr[:, 2], alpha=0.2)
+# plt.legend()
+# plt.xlabel("Number of time points")
+# plt.ylabel("Time (s)")
+# plt.title("Low pass filtering benchmark")
+# plt.subplot(122)
+# for arr, label in zip(
+#     [dims_sinc_numba, dims_butter_scipy],
+#     ["Windowed-sinc", "Butter"],
+#     ):
+#     plt.plot(arr[:, 0], arr[:, 1], "o-", label=label)
+#     plt.fill_between(arr[:, 0], arr[:, 1] - arr[:, 2], arr[:, 1] + arr[:, 2], alpha=0.2)
+# plt.legend()
+# plt.xlabel("Number of dimensions")
+# plt.ylabel("Time (s)")
+# plt.title("Low pass filtering benchmark")
+#
+
+
+# dims_sinc_numba = benchmark_dimensions(mode="sinc")
+# dims_butter_scipy = benchmark_dimensions(mode="butter")
 
 # %%
-# Figure
-plt.figure()
-for arr, label in zip(
-    [num_times, jax_times],
-    ["numba backend", "pynajax backend"],
-    ):
-    plt.plot(arr[:, 0], arr[:, 1], "o-", label=label)
-    plt.fill_between(arr[:, 0], arr[:, 1] - arr[:, 2], arr[:, 1] + arr[:, 2], alpha=0.2)
-plt.legend()
-plt.xlabel("Number of Dimensions")
-plt.ylabel("Time (s)")
-plt.title("Convolve benchmark")
-plt.savefig("../images/convolve_benchmark.png")
-plt.show()
+#
+# dims_sinc_jax = benchmark_dimensions(mode="sinc")
+# dims_butter_jax = benchmark_dimensions(mode="butter")
+#
+#
+#
 
-
-# %% 
+#
+# # %%
 # Saving
 
