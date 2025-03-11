@@ -45,7 +45,7 @@ def tests(session):
     copy_and_overwrite(nap_test_path.joinpath("nwbfilestest"), path.joinpath("nwbfilestest"))
 
     try:
-        session.run("pytest")  # , "--pdb", "--pdbcls=IPython.terminal.debugger:Pdb")
+        session.run("pytest", "--cov=pynajax")  # , "--pdb", "--pdbcls=IPython.terminal.debugger:Pdb")
     finally:
         # Remove files
         for f in tocopy:

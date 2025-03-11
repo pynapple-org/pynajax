@@ -4,7 +4,13 @@ import numpy as np
 
 from pynajax.jax_core_bin_average import bin_average
 
-from .utils import _fill_forward, _get_idxs, _get_shifted_indices, _get_slicing, pad_and_roll
+from .utils import (
+    _fill_forward,
+    _get_idxs,
+    _get_shifted_indices,
+    _get_slicing,
+    pad_and_roll,
+)
 
 # dot prod shifted counts vs 1D var y vmapped over shift
 # [(n_shift, T), (T, )] -> (n_shift, )

@@ -1,3 +1,4 @@
+import warnings
 from functools import partial
 
 import jax
@@ -13,7 +14,7 @@ from .utils import (
 )
 
 
-@partial(jax.jit, static_argnums=(3, ))
+@partial(jax.jit, static_argnums=(3,))
 def _recursion_loop_sos(signal, sos, zi, nan_function):
     """
     Applies a recursive second-order section (SOS) filter to the input signal.
@@ -43,8 +44,7 @@ def _recursion_loop_sos(signal, sos, zi, nan_function):
         zi_slice = zi_slice.at[s, 0].set(
             sos[s, 1] * x_cur - sos[s, 4] * x_new + zi_slice[s, 1]
         )
-        zi_slice = zi_slice.at[s, 1].set(
-            sos[s, 2] * x_cur - sos[s, 5] * x_new)
+        zi_slice = zi_slice.at[s, 1].set(sos[s, 2] * x_cur - sos[s, 5] * x_new)
         x_cur = x_new
         return x_cur, zi_slice
 
@@ -72,7 +72,9 @@ def _recursion_loop_sos(signal, sos, zi, nan_function):
 
 
 # vectorize the recursion over signals.
-_vmap_recursion_sos = jax.vmap(_recursion_loop_sos, in_axes=(1, None, 2, None), out_axes=1)
+_vmap_recursion_sos = jax.vmap(
+    _recursion_loop_sos, in_axes=(1, None, 2, None), out_axes=1
+)
 
 
 def _insert_constant(idx_start, idx_end, data_array, window_size, const=jnp.nan):
@@ -150,7 +152,22 @@ def jax_sosfiltfilt(sos, time_array, data_array, starts, ends):
     : jnp.ndarray
         The zero-phase filtered data array, with the same shape as the input data array.
     """
+    data_array = jnp.asarray(data_array, dtype=sos.dtype)
 
+    # this is triggered when the float64 are not active.
+    # Warn if there's a precision mismatch between sos coefficients and the JAX data array.
+    if sos.dtype != data_array.dtype:
+        warnings.warn(
+            message=(
+                f"Precision mismatch: sos coefficients are in {sos.dtype}, "
+                f"but the JAX data array is in {data_array.dtype}. "
+                f"For float64 precision filtering, enable float64 in JAX with:\n"
+                f"jax.config.update('jax_enable_x64', True)\n"
+            ),
+            category=UserWarning,
+            stacklevel=2,
+        )
+        sos = sos.astype(data_array.dtype)
     original_shape = data_array.shape
     data_array = data_array.reshape(data_array.shape[0], -1)
 
@@ -160,7 +177,9 @@ def jax_sosfiltfilt(sos, time_array, data_array, starts, ends):
     ntaps -= min((sos[:, 2] == 0).sum(), (sos[:, 5] == 0).sum())
     pad_num = 3 * ntaps
 
-    ext, ix_start_pad, ix_end_pad, ix_data = _odd_ext_multiepoch(pad_num, time_array, data_array, starts, ends)
+    ext, ix_start_pad, ix_end_pad, ix_data = _odd_ext_multiepoch(
+        pad_num, time_array, data_array, starts, ends
+    )
 
     # get the start/end index of each epoch after padding
     ix_start_ep = np.hstack((ix_start_pad[0], ix_start_pad[1:-1] + pad_num))
@@ -169,7 +188,10 @@ def jax_sosfiltfilt(sos, time_array, data_array, starts, ends):
     zi = signal.sosfilt_zi(sos)
 
     # this braodcast has shape (*zi.shape, data_array.shape[1], len(ix_start_pad))
-    z0 = zi[..., jnp.newaxis, jnp.newaxis] * ext.T[jnp.newaxis, jnp.newaxis, ..., ix_start_ep]
+    z0 = (
+        zi[..., jnp.newaxis, jnp.newaxis]
+        * ext.T[jnp.newaxis, jnp.newaxis, ..., ix_start_ep]
+    )
 
     if len(starts) > 1:
         # multi epoch case augmenting with nans.
@@ -187,7 +209,6 @@ def jax_sosfiltfilt(sos, time_array, data_array, starts, ends):
         idx_end_shift = ix_end_ep
         ix_shift = slice(None)
 
-
     # call forward recursion
     out = _vmap_recursion_sos(aug_data, sos, z0, nan_func)
 
@@ -196,7 +217,10 @@ def jax_sosfiltfilt(sos, time_array, data_array, starts, ends):
     out = out.at[ix_shift].set(out[irev])
 
     # compute new init cond
-    z0 = zi[..., jnp.newaxis, jnp.newaxis] * out.T[jnp.newaxis, jnp.newaxis, ..., idx_start_shift]
+    z0 = (
+        zi[..., jnp.newaxis, jnp.newaxis]
+        * out.T[jnp.newaxis, jnp.newaxis, ..., idx_start_shift]
+    )
 
     # call backward recursion
     out = _vmap_recursion_sos(out, sos, z0, nan_func)

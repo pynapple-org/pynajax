@@ -252,7 +252,9 @@ def _get_shifted_indices(idx_start, idx_end, window, start_from=0):
     : tuple of ArrayLike
         A tuple containing two arrays: shifted start indices and shifted end indices.
     """
-    cum_delta = np.concatenate([[start_from], start_from + np.cumsum(idx_end - idx_start)])
+    cum_delta = np.concatenate(
+        [[start_from], start_from + np.cumsum(idx_end - idx_start)]
+    )
     idx_start_shift = window * np.arange(idx_start.shape[0]) + cum_delta[:-1]
     idx_end_shift = window * np.arange(idx_end.shape[0]) + cum_delta[1:]
     return idx_start_shift, idx_end_shift
@@ -491,17 +493,19 @@ def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
     if len(starts) <= 1:
 
         if data.shape[0] < n_pts:
-            raise ValueError("The length of the data per each epoch must be greater "
-                             f"than `{n_pts}`, which is required by the padding used "
-                             "in this algorithm.")
+            raise ValueError(
+                "The length of the data per each epoch must be greater "
+                f"than `{n_pts}`, which is required by the padding used "
+                "in this algorithm."
+            )
 
         ext = jnp.concatenate(
             (
                 2 * data[0] - data[slice(n_pts, 0, -1)],
                 data,
-                2 * data[-1] - data[slice(-2, -(n_pts + 2), -1)]
+                2 * data[-1] - data[slice(-2, -(n_pts + 2), -1)],
             ),
-            axis=0
+            axis=0,
         )
         ix_pad_start, idx_pad_end = jnp.array([0]), jnp.array([len(ext)])
         ix_data = jnp.arange(n_pts, data.shape[0] + n_pts)
@@ -511,20 +515,31 @@ def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
         idx_end = np.searchsorted(time, ends, side="right")
 
         if np.any(idx_end - idx_start < n_pts):
-            raise ValueError("The length of the data per each epoch must be greater "
-                             f"than `{n_pts}`, which is required by the padding used "
-                             "in this algorithm.")
+            raise ValueError(
+                "The length of the data per each epoch must be greater "
+                f"than `{n_pts}`, which is required by the padding used "
+                "in this algorithm."
+            )
         # use slower slicing with indices with multi-epochs
         # use broadcasting trick
-        i_after_start = idx_start[:, jnp.newaxis] + jnp.ones((len(idx_start), 1), dtype=int) * jnp.arange(n_pts, 0, -1)[jnp.newaxis]
-        i_before_end = idx_end[:, jnp.newaxis] - jnp.ones((len(idx_start), 1), dtype=int) * jnp.arange(2, n_pts + 2)[jnp.newaxis]
+        i_after_start = (
+            idx_start[:, jnp.newaxis]
+            + jnp.ones((len(idx_start), 1), dtype=int)
+            * jnp.arange(n_pts, 0, -1)[jnp.newaxis]
+        )
+        i_before_end = (
+            idx_end[:, jnp.newaxis]
+            - jnp.ones((len(idx_start), 1), dtype=int)
+            * jnp.arange(2, n_pts + 2)[jnp.newaxis]
+        )
 
         # calculate edges as the above, more readable formula and store it
         # uses broadcasting
         edges = np.hstack(
             (
                 2 * data[idx_start, jnp.newaxis] - data[i_after_start],
-                2 * data[idx_end-1, jnp.newaxis] - data[i_before_end])
+                2 * data[idx_end - 1, jnp.newaxis] - data[i_before_end],
+            )
         ).reshape(-1, *data.shape[1:])
 
         # count how many time points the padded array has
@@ -533,12 +548,20 @@ def _odd_ext_multiepoch(n_pts, time, data, starts, ends):
         # get the indices for setting elements
         # shift by a window every epoch
         idx_start_shift, idx_end_shift = _get_shifted_indices(
-            idx_start, idx_end, 2*n_pts, start_from=n_pts
+            idx_start, idx_end, 2 * n_pts, start_from=n_pts
         )
         ix_data = _get_slicing(idx_start_shift, idx_end_shift)
-        ix_padding, ix_pad_start, idx_pad_end = _get_complement_slicing(idx_start_shift, idx_end_shift, new_size)
+        ix_padding, ix_pad_start, idx_pad_end = _get_complement_slicing(
+            idx_start_shift, idx_end_shift, new_size
+        )
 
         # instantiate new array
-        ext = jnp.zeros((new_size, *data.shape[1:])).at[ix_data].set(data).at[ix_padding].set(edges)
+        ext = (
+            jnp.zeros((new_size, *data.shape[1:]))
+            .at[ix_data]
+            .set(data)
+            .at[ix_padding]
+            .set(edges)
+        )
 
     return ext, ix_pad_start, idx_pad_end, ix_data
