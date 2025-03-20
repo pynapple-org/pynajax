@@ -31,13 +31,19 @@ def linters(session):
 @nox.session(name="tests")
 def tests(session):
     """Run the test suite."""
-
+    # run tests in debug mode with:
+    # nox -s tests -- --debug
+    if "--debug" in session.posargs:
+        run_command = "pytest", "--cov=pynajax", "--pdb"
+    else:
+        run_command = "pytest", "--cov=pynajax"
     nap_test_path = Path("../pynapple/tests")
     path = Path("tests/")
 
     # Copying test files
+    include = ["helper_tests.py"]
     tocopy = os.listdir(nap_test_path)
-    tocopy = list(filter(lambda x: x[0:5] == "test_" and x not in to_exclude, tocopy))
+    tocopy = list(filter(lambda x: (x[0:5] == "test_" or x in include) and (x not in to_exclude), tocopy))
     for f in tocopy:
         shutil.copy(nap_test_path.joinpath(f), path.joinpath(f))
 
@@ -45,7 +51,7 @@ def tests(session):
     copy_and_overwrite(nap_test_path.joinpath("nwbfilestest"), path.joinpath("nwbfilestest"))
 
     try:
-        session.run("pytest")  # , "--pdb", "--pdbcls=IPython.terminal.debugger:Pdb")
+        session.run(*run_command)  # , "--pdb", "--pdbcls=IPython.terminal.debugger:Pdb")
     finally:
         # Remove files
         for f in tocopy:
