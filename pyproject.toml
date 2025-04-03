@@ -60,8 +60,6 @@ docs = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=pynajax"
-
 
 [tool.ruff]
 line-length = 99
