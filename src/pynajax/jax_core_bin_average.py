@@ -180,8 +180,10 @@ def bin_average(time_array, data_array, starts, ends, binsize):
 
     # Digitize time points to find corresponding bins, adjusting indices to be 0-based.
     bins = np.digitize(time_array[ix], edges) - 1
-    average = jit_average(bins, data_array[ix], edges)
-
-    # Create a new time array with bin centers, and filter by in-epoch bins.
-    time_array_new = edges[:-1] + binsize / 2
-    return time_array_new[in_epoch], average[in_epoch]
+    if len(bins):
+        average = jit_average(bins, data_array[ix], edges)
+        # Create a new time array with bin centers, and filter by in-epoch bins.
+        time_array_new = edges[:-1] + binsize / 2
+        return time_array_new[in_epoch], average[in_epoch]
+    else:
+        return np.array([]), jnp.asarray([])

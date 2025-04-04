@@ -32,7 +32,7 @@ def linters(session):
 def tests(session):
     """Run the test suite."""
     # run tests in debug mode with:
-    # nox -s tests -- --debug
+    # nox -s tests --debug
     if "--debug" in session.posargs:
         run_command = "pytest", "--cov=pynajax", "--pdb"
     else:
