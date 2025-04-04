@@ -1,11 +1,11 @@
 [build-system]
-requires      = ["setuptools>=61.0.0", "setuptools-scm", "wheel"]
+requires      = ["setuptools>=64", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 
 [project]
 name = "pynajax"
-version = "0.2.0"
+dynamic = ["version"]
 authors = [{name = "pynajax authors"}]
 description = "A JAX backend for pynapple."
 readme = "README.md"
@@ -35,6 +35,9 @@ dependencies = [
 where = ["src"]             # The directory where package modules are located
 include = ["pynajax"] # The specific package(s) to include in the distribution
 
+[tool.setuptools_scm]
+version_scheme = 'no-guess-dev'
+local_scheme = 'no-local-version'
 
 # Define optional dependencies for the project
 [project.optional-dependencies]
@@ -45,7 +48,9 @@ dev = [
     "pytest-cov",                   # Test coverage plugin for pytest
     'matplotlib>=3.7',              # Plotting library
     "nox",
-    "ruff"
+    "ruff",
+    "flake8",                       # Code linter
+    "Flake8-pyproject",             # So that flake8 can be configured in this file
 ]
 docs = [
     "mkdocs",                       # Documentation generator
@@ -116,3 +121,8 @@ exclude_also = [
     "def _get_idxs",
     "def _get_slicing"    
 ]
+
+[tool.flake8]
+ignore = ["E203", "E501", "W293", "E231", "W503", "C901", "W291", "E266"]
+max-complexity = 10
+exclude = ["doc", "__init__.py", "tests"]
