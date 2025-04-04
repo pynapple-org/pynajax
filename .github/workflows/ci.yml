@@ -34,7 +34,7 @@ jobs:
 
       - name: Clone and install pynapple
         run: |
-          git clone https://github.com/pynapple-org/pynapple.git ../pynapple
+          git clone --branch dev https://github.com/pynapple-org/pynapple.git ../pynapple
           pip install -e ../pynapple
 
       - name: Run nox
