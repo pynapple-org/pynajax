@@ -1,5 +1,5 @@
 """
-# event_trigger_average
+# event_triggered_average
 """
 
 import numpy as np
@@ -19,12 +19,12 @@ def get_mean_perf_class(tsg, tsd, ep, binsize):
     tmp = np.zeros(n)
     for i in range(n):
         t1 = perf_counter()
-        out = nap.compute_event_trigger_average(tsg, tsd, binsize, (binsize*10, binsize*10), ep)
+        out = nap.compute_event_triggered_average(tsg, tsd, binsize, (binsize*10, binsize*10), ep)
         t2 = perf_counter()
         tmp[i] = t2 - t1
     return np.mean(tmp), np.std(tmp)
 
-def benchmark_event_trigger_average(binsize):
+def benchmark_event_triggered_average(binsize):
     times = []
     for T in np.arange(100000, 1000000, 100000):
         time_array = np.arange(T) / 2
@@ -37,7 +37,7 @@ def benchmark_event_trigger_average(binsize):
             {i:nap.Ts(time_array[::2]) for i in range(10)}
 
             )
-        sta = nap.compute_event_trigger_average(tsg, tsd, binsize, (binsize*10, binsize*10), ep)
+        sta = nap.compute_event_triggered_average(tsg, tsd, binsize, (binsize*10, binsize*10), ep)
 
         m, s = get_mean_perf_class(tsg, tsd, ep, binsize)
 
@@ -49,14 +49,14 @@ def benchmark_event_trigger_average(binsize):
 binsize = 1.0
 
 nap.nap_config.set_backend("numba")
-num_times = benchmark_event_trigger_average(binsize)
+num_times = benchmark_event_triggered_average(binsize)
 
 
 # %%
 # Calling with jax
 
 nap.nap_config.set_backend("jax")
-jax_times = benchmark_event_trigger_average(binsize)
+jax_times = benchmark_event_triggered_average(binsize)
 
 
 # %%
