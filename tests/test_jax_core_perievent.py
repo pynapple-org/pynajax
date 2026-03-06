@@ -1,6 +1,6 @@
 import numpy as np
 import pytest
-from pynajax.jax_process_perievent import event_trigger_average
+from pynajax.jax_process_perievent import event_triggered_average
 from pynajax.utils import _get_idxs, pad_and_roll
 
 
@@ -97,13 +97,13 @@ def test_get_idxs():
         )
     ]
 )
-def test_event_trigger_average_single_ep(counts, stimuli, expected_out):
+def test_event_triggered_average_single_ep(counts, stimuli, expected_out):
     time = np.arange(counts.shape[0])
     windows = (1, 1)
     binsize = 1.
     starts = [0]
     ends = [6]
-    out = event_trigger_average(time, counts, time, stimuli, starts, ends, windows, binsize, batch_size=128)
+    out = event_triggered_average(time, counts, time, stimuli, starts, ends, windows, binsize, batch_size=128)
     np.testing.assert_array_equal(out, expected_out)
 
 @pytest.mark.parametrize(
@@ -116,13 +116,13 @@ def test_event_trigger_average_single_ep(counts, stimuli, expected_out):
         )
     ]
 )
-def test_event_trigger_average_multi_ep(counts, stimuli, expected_out):
+def test_event_triggered_average_multi_ep(counts, stimuli, expected_out):
     time = np.arange(counts.shape[0])
     windows = (1, 1)
     binsize = 1.
     starts = [0, 3]
     ends = [2, 7]
-    out = event_trigger_average(time, counts, time, stimuli, starts, ends, windows, binsize, batch_size=128)
+    out = event_triggered_average(time, counts, time, stimuli, starts, ends, windows, binsize, batch_size=128)
     np.testing.assert_array_equal(out, expected_out)
 
 
@@ -144,7 +144,7 @@ def test_event_trigger_average_multi_ep(counts, stimuli, expected_out):
         )
     ]
 )
-def test_event_trigger_average_batch_size(counts, stimuli, expected_out):
+def test_event_triggered_average_batch_size(counts, stimuli, expected_out):
     stimuli[2] = 2.0
     expected_out[1] = 2.0
 
@@ -153,7 +153,7 @@ def test_event_trigger_average_batch_size(counts, stimuli, expected_out):
     binsize = 1.
     starts = [0]
     ends = [6]
-    out = event_trigger_average(
+    out = event_triggered_average(
         time, counts, time, stimuli, starts, ends,
         windows, binsize, batch_size=5
         )

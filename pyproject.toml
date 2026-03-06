@@ -9,7 +9,7 @@ dynamic = ["version"]
 authors = [{name = "pynajax authors"}]
 description = "A JAX backend for pynapple."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 keywords = ["neuroscience", "jax-backend", "pynapple"]
 license = { file = "LICENSE" }
 classifiers = [

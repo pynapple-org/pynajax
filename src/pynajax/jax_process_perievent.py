@@ -17,7 +17,7 @@ _dot_prod_neu = jax.vmap(_dot_prod, in_axes=(2, None), out_axes=1)
 _dot_prod_feature = jax.vmap(_dot_prod_neu, in_axes=(None, 1), out_axes=2)
 
 
-def event_trigger_average(
+def event_triggered_average(
     time_target_array,
     count_array,
     time_array,
